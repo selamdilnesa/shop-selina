@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+html,
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
 
 @custom-variant dark (&:is(.dark *));
 
