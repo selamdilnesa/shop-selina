@@ -4,25 +4,84 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCart } from "@/context/CartContext";
+
+function NavIcon({ name }: { name: string }) {
+  const paths: Record<string, React.ReactNode> = {
+    Home: (
+      <>
+        <path d="m3 10 9-7 9 7" />
+        <path d="M5 9v12h14V9" />
+        <path d="M9 21v-7h6v7" />
+      </>
+    ),
+    Products: (
+      <>
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M3 10h18M9 10v10" />
+      </>
+    ),
+    Categories: (
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" />
+      </>
+    ),
+    Cart: (
+      <>
+        <path d="M3 3h2l2.4 11.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6" />
+        <circle cx="10" cy="20" r="1" />
+        <circle cx="18" cy="20" r="1" />
+      </>
+    ),
+    Login: (
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-[18px] w-[18px] shrink-0"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const { cart } = useCart();
+
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   const links = [
     { name: "Home", href: "/" },
     { name: "Products", href: "/products" },
     { name: "Categories", href: "/categories" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
     { name: "Cart", href: "/cart" },
     { name: "Login", href: "/login" },
   ];
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
         setMenuOpen(false);
       }
     }
@@ -38,44 +97,54 @@ export default function Navbar() {
     };
   }, [menuOpen]);
 
+  function isActive(href: string) {
+    return href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
+  }
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-white px-4 py-3 shadow-sm sm:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-[#e8dfd2] bg-white/95 px-4 py-3 shadow-sm backdrop-blur-md sm:px-8">
       <nav className="flex items-center justify-between gap-4">
-        <Link href="/" className="flex shrink-0 items-center gap-3">
+        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
           <Image
             src="/logo.webp"
             alt="Shop Selina logo"
             width={400}
             height={200}
             priority
-            className="h-16 w-auto object-contain sm:h-24"
+            className="h-12 w-auto object-contain sm:h-16"
           />
-
-          <span className="text-xl font-bold uppercase tracking-wider text-amber-950 sm:text-3xl lg:text-4xl">
+          <span className="text-lg font-bold uppercase tracking-wider text-[#402b20] sm:text-2xl lg:text-3xl">
             Shop Selina
           </span>
         </Link>
 
-        <div className="hidden items-center gap-6 text-amber-950 md:flex">
+        <div className="hidden items-center gap-5 text-[#402b20] lg:gap-7 md:flex">
           {links.map((link) => {
-            const isActive =
-              link.href === "/"
-                ? pathname === "/"
-                : pathname === link.href ||
-                  pathname.startsWith(`${link.href}/`);
+            const active = isActive(link.href);
 
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                aria-current={isActive ? "page" : undefined}
-                className={`text-base font-semibold transition-all duration-200 hover:text-amber-700 ${
-                  isActive
-                    ? "text-amber-800 underline decoration-2 underline-offset-8"
-                    : "text-amber-950"
+                aria-current={active ? "page" : undefined}
+                className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] ${
+                  active ? "text-[#a78655]" : "text-[#402b20]"
                 }`}
               >
+                <NavIcon name={link.name} />
                 {link.name}
+
+                {link.href === "/cart" && cartCount > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d4af6a] px-1 text-[10px] font-bold text-[#402b20]">
+                    {cartCount}
+                  </span>
+                )}
+
+                {active && (
+                  <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a]" />
+                )}
               </Link>
             );
           })}
@@ -84,7 +153,7 @@ export default function Navbar() {
         <button
           type="button"
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-amber-950 hover:bg-amber-50 md:hidden"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#402b20] transition hover:bg-[#faf7f2] md:hidden"
           aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={menuOpen}
         >
@@ -94,12 +163,13 @@ export default function Navbar() {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
+                d="m6 6 12 12M18 6 6 18"
+                stroke="currentColor"
+                strokeWidth="1.8"
                 strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
               />
             </svg>
           ) : (
@@ -108,12 +178,13 @@ export default function Navbar() {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
                 d="M4 6h16M4 12h16M4 18h16"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
               />
             </svg>
           )}
@@ -123,28 +194,33 @@ export default function Navbar() {
       {menuOpen && (
         <div
           ref={menuRef}
-          className="absolute right-4 top-full z-50 mt-2 flex w-56 flex-col gap-1 rounded-xl border border-amber-100 bg-white p-3 text-amber-950 shadow-xl md:hidden"
+          className="absolute right-4 top-full z-50 mt-2 flex w-64 flex-col gap-1 rounded-xl border border-[#e8dfd2] bg-white p-3 text-[#402b20] shadow-xl md:hidden"
         >
           {links.map((link) => {
-            const isActive =
-              link.href === "/"
-                ? pathname === "/"
-                : pathname === link.href ||
-                  pathname.startsWith(`${link.href}/`);
+            const active = isActive(link.href);
 
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                aria-current={isActive ? "page" : undefined}
-                className={`rounded-lg px-4 py-2.5 font-semibold transition-colors ${
-                  isActive
-                    ? "bg-amber-50 text-amber-800"
-                    : "text-amber-950 hover:bg-amber-50"
+                aria-current={active ? "page" : undefined}
+                className={`flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                  active
+                    ? "bg-[#faf7f2] text-[#a78655]"
+                    : "text-[#402b20] hover:bg-[#faf7f2]"
                 }`}
               >
-                {link.name}
+                <span className="flex items-center gap-3">
+                  <NavIcon name={link.name} />
+                  {link.name}
+                </span>
+
+                {link.href === "/cart" && cartCount > 0 && (
+                  <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-[#d4af6a] px-1.5 text-xs font-bold text-[#402b20]">
+                    {cartCount}
+                  </span>
+                )}
               </Link>
             );
           })}
