@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import Navbar from "@/components/ui/Navbar";
+import Navbar from "@/components/Navbar";
 import { CartProvider } from "@/context/CartContext";
-import { useCart } from "@/context/CartContext";
+import { AuthProvider } from "@/context/AuthContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -39,10 +39,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <AuthProvider>
           <CartProvider>
-            <Navbar/>
-          {children}
-          </CartProvider>
+            <Navbar />
+           {children}
+         </CartProvider>
+        </AuthProvider>
           </ThemeProvider>
       </body>
     </html>
