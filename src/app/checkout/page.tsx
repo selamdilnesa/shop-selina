@@ -1,10 +1,10 @@
-
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
+import { saveOrder } from "@/lib/orders";
 
 export default function CheckoutPage() {
   const { cart, removeFromCart } = useCart();
@@ -55,16 +55,22 @@ export default function CheckoutPage() {
     };
 
     try {
+      // Save the order to the browser's persistent storage.
+      saveOrder(order);
+
+      // Keep the latest order for the existing checkout success page.
       sessionStorage.setItem(
         "shop-selina-last-order",
         JSON.stringify(order)
       );
 
+      // Clear the cart after the order is saved.
       cart.forEach((item) => removeFromCart(item.id));
 
       router.push("/checkout/success");
     } catch {
       setIsSubmitting(false);
+
       alert(
         "We couldn't save your checkout summary in this browser. Please try again."
       );
@@ -113,7 +119,6 @@ export default function CheckoutPage() {
           onSubmit={handleSubmit}
           className="mt-10 grid grid-cols-1 items-start gap-8 lg:grid-cols-3"
         >
-          {/* Customer and delivery information */}
           <section className="rounded-2xl border border-[#e8dfd2] bg-white p-6 shadow-sm sm:p-8 lg:col-span-2">
             <h2 className="font-serif text-2xl font-semibold text-[#402b20]">
               Delivery Information
@@ -219,7 +224,6 @@ export default function CheckoutPage() {
             </div>
           </section>
 
-          {/* Order summary */}
           <aside className="h-fit rounded-2xl border border-[#e8dfd2] bg-white p-6 shadow-sm sm:p-8">
             <h2 className="font-serif text-2xl font-semibold text-[#402b20]">
               Order Summary
@@ -247,7 +251,9 @@ export default function CheckoutPage() {
 
             <div className="mt-6 border-t border-[#e8dfd2] pt-5">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-[#8b796c]">Total Price</span>
+                <span className="text-sm text-[#8b796c]">
+                  Total Price
+                </span>
 
                 <span className="text-xl font-bold text-[#76533c]">
                   ${subtotal.toFixed(2)}
