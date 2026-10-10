@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { setAuthenticatedUser } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -41,7 +43,11 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(
+      const cleanName = name.trim();
+      const cleanEmail = email.trim().toLowerCase();
+
+      // Step 1: Create the account
+      const registerResponse = await fetch(
         "https://api.escuelajs.co/api/v1/users/",
         {
           method: "POST",
@@ -49,30 +55,88 @@ export default function RegisterPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name: name.trim(),
-            email: email.trim(),
+            name: cleanName,
+            email: cleanEmail,
             password,
             avatar: "https://i.imgur.com/LDy6l7T.png",
           }),
         }
       );
 
-      const data = await response.json();
+      const registerData = await registerResponse.json();
 
-      if (!response.ok || !data.id) {
+      if (!registerResponse.ok || !registerData.id) {
         setError(
-          response.status === 400
+          registerResponse.status === 400
             ? "This email may already be registered. Try logging in."
-            : data.message || "Registration failed. Please try again."
+            : registerData.message || "Registration failed. Please try again."
         );
         return;
       }
 
-      setSuccess("Account created successfully! Redirecting to login...");
+      // Step 2: Log in automatically
+      const loginResponse = await fetch(
+        "https://api.escuelajs.co/api/v1/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: cleanEmail,
+            password,
+          }),
+        }
+      );
 
-      setTimeout(() => {
-        router.push("/login");
-      }, 1500);
+      const loginData = await loginResponse.json();
+
+      if (
+        !loginResponse.ok ||
+        !loginData.access_token ||
+        !loginData.refresh_token
+      ) {
+        setError(
+          "Your account was created, but automatic login failed. Please sign in."
+        );
+        return;
+      }
+
+      // Step 3: Get the authenticated user's details
+      const profileResponse = await fetch(
+        "https://api.escuelajs.co/api/v1/auth/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${loginData.access_token}`,
+          },
+        }
+      );
+
+      const profileData = await profileResponse.json();
+
+      if (!profileResponse.ok || !profileData.id) {
+        setError(
+          "Your account was created, but we couldn't load your profile. Please sign in."
+        );
+        return;
+      }
+
+      // Step 4: Save authentication and profile information
+      localStorage.setItem("access_token", loginData.access_token);
+      localStorage.setItem("refresh_token", loginData.refresh_token);
+      localStorage.setItem("custom_profile_name", cleanName);
+
+      // Step 5: Update the app's authentication state immediately
+      setAuthenticatedUser({
+        id: profileData.id,
+        name: cleanName,
+        email: profileData.email || cleanEmail,
+      });
+
+      // Step 6: Go directly to the profile page
+      setSuccess("Account created successfully! Redirecting to your profile...");
+
+      router.replace("/profile");
     } catch {
       setError("Unable to connect to the server. Please try again.");
     } finally {
@@ -226,3 +290,4 @@ export default function RegisterPage() {
     </main>
   );
 }
+

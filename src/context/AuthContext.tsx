@@ -19,6 +19,7 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   refreshUser: () => Promise<void>;
+  setAuthenticatedUser: (user: User) => void;
   logout: () => void;
   updateAvatar: (avatar: string) => void;
   updateName: (name: string) => void;
@@ -56,15 +57,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const profile: User = await response.json();
+
       const savedAvatar = localStorage.getItem("custom_profile_avatar");
       const savedName = localStorage.getItem("custom_profile_name");
 
       setUser({
         ...profile,
         name: savedName || profile.name,
-        avatar: savedAvatar || profile.avatar,
+        avatar: savedAvatar || undefined,
       });
     } catch {
+      // Don't treat a network failure as a successful login.
       setUser(null);
     } finally {
       setLoading(false);
@@ -75,7 +78,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void refreshUser();
   }, []);
 
-  // Update and save the profile picture in this browser.
+  function setAuthenticatedUser(newUser: User) {
+    const savedAvatar = localStorage.getItem("custom_profile_avatar");
+    const savedName = localStorage.getItem("custom_profile_name");
+
+    setUser({
+      ...newUser,
+      name: savedName || newUser.name,
+      avatar: savedAvatar || undefined,
+    });
+
+    setLoading(false);
+  }
+
   function updateAvatar(avatar: string) {
     if (avatar) {
       localStorage.setItem("custom_profile_avatar", avatar);
@@ -98,7 +113,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("custom_profile_name", trimmedName);
 
     setUser((currentUser) =>
-      currentUser ? { ...currentUser, name: trimmedName } : null
+      currentUser
+        ? { ...currentUser, name: trimmedName }
+        : null
     );
   }
 
@@ -109,6 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("custom_profile_name");
 
     setUser(null);
+    setLoading(false);
   }
 
   return (
@@ -117,6 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         loading,
         refreshUser,
+        setAuthenticatedUser,
         logout,
         updateAvatar,
         updateName,
