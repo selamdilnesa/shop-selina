@@ -89,12 +89,11 @@ export default function CartPage() {
                 <span>Total</span>
                 <span className="text-[#8b5a2b]">${subtotal.toFixed(2)}</span>
               </div>
-              <button
-                type="button"
-                className="mt-6 w-full rounded-full bg-[#4a2c11] py-3 font-semibold text-[#fdfbf7] shadow-md transition hover:bg-[#38200b]"
-              >
-                Proceed to Checkout
-              </button>
+              <Link
+                href="/checkout"
+                className="mt-6 block w-full rounded-full bg-[#4a2c11] py-3 text-center font-semibold text-[#fdfbf7] shadow-md transition hover:bg-[#38200b]">
+                  Proceed to Checkout
+              </Link>
             </div>
           </div>
         )}

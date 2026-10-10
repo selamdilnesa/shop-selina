@@ -66,13 +66,15 @@ export default function Navbar() {
   const pathname = usePathname();
   const { cart } = useCart();
 
-  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const cartCount = cart.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   const links = [
     { name: "Home", href: "/" },
     { name: "Products", href: "/products" },
     { name: "Categories", href: "/categories" },
-    { name: "Cart", href: "/cart" },
     { name: "Login", href: "/login" },
   ];
 
@@ -104,24 +106,30 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#e8dfd2] bg-white/95 px-4 py-3 shadow-sm backdrop-blur-md sm:px-8">
-      <nav className="flex items-center justify-between gap-4">
-        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
+    <header className="sticky top-0 z-50 w-full border-b border-[#e8dfd2] bg-white/95 px-3 py-3 shadow-sm backdrop-blur-md sm:px-8">
+      <nav className="flex items-center justify-between gap-2 sm:gap-4">
+        {/* Logo and brand */}
+        <Link
+          href="/"
+          className="flex min-w-0 shrink items-center gap-1.5 sm:gap-3"
+        >
           <Image
             src="/logo.webp"
             alt="Shop Selina logo"
             width={400}
             height={200}
             priority
-            className="h-12 w-auto object-contain sm:h-16"
+            className="h-10 w-auto object-contain sm:h-16"
           />
-          <span className="text-lg font-bold uppercase tracking-wider text-[#402b20] sm:text-2xl lg:text-3xl">
+
+          <span className="whitespace-nowrap text-sm font-bold uppercase tracking-wide text-[#402b20] sm:text-2xl sm:tracking-wider lg:text-3xl">
             Shop Selina
           </span>
         </Link>
 
-        <div className="hidden items-center gap-5 text-[#402b20] lg:gap-7 md:flex">
-          {links.map((link) => {
+        {/* Desktop navigation */}
+        <div className="hidden items-center gap-5 text-[#402b20] md:flex lg:gap-7">
+          {links.slice(0, 3).map((link) => {
             const active = isActive(link.href);
 
             return (
@@ -136,11 +144,48 @@ export default function Navbar() {
                 <NavIcon name={link.name} />
                 {link.name}
 
-                {link.href === "/cart" && cartCount > 0 && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d4af6a] px-1 text-[10px] font-bold text-[#402b20]">
-                    {cartCount}
-                  </span>
+                {active && (
+                  <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a]" />
                 )}
+              </Link>
+            );
+          })}
+
+          <Link
+            href="/cart"
+            aria-current={isActive("/cart") ? "page" : undefined}
+            className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] ${
+              isActive("/cart") ? "text-[#a78655]" : "text-[#402b20]"
+            }`}
+          >
+            <NavIcon name="Cart" />
+            Cart
+
+            {cartCount > 0 && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d4af6a] px-1 text-[10px] font-bold text-[#402b20]">
+                {cartCount}
+              </span>
+            )}
+
+            {isActive("/cart") && (
+              <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a]" />
+            )}
+          </Link>
+
+          {links.slice(3).map((link) => {
+            const active = isActive(link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] ${
+                  active ? "text-[#a78655]" : "text-[#402b20]"
+                }`}
+              >
+                <NavIcon name={link.name} />
+                {link.name}
 
                 {active && (
                   <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a]" />
@@ -150,51 +195,86 @@ export default function Navbar() {
           })}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#402b20] transition hover:bg-[#faf7f2] md:hidden"
-          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={menuOpen}
-        >
-          {menuOpen ? (
+        {/* Mobile cart: always visible outside the hamburger */}
+        <div className="ml-auto flex shrink-0 items-center gap-1 md:hidden">
+          <Link
+            href="/cart"
+            aria-label={`Shopping cart, ${cartCount} items`}
+            aria-current={isActive("/cart") ? "page" : undefined}
+            className={`relative flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-[#faf7f2] ${
+              isActive("/cart") ? "text-[#a78655]" : "text-[#402b20]"
+            }`}
+          >
             <svg
-              className="h-6 w-6"
+              viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                d="m6 6 12 12M18 6 6 18"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-            </svg>
-          ) : (
-            <svg
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
               aria-hidden="true"
             >
-              <path
-                d="M4 6h16M4 12h16M4 18h16"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
+              <path d="M3 3h2l2.4 11.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6" />
+              <circle cx="10" cy="20" r="1" />
+              <circle cx="18" cy="20" r="1" />
             </svg>
-          )}
-        </button>
+
+            {cartCount > 0 && (
+              <span className="absolute right-0.5 top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#d4af6a] px-1 text-[10px] font-bold text-[#402b20]">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Hamburger menu */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#402b20] transition hover:bg-[#faf7f2]"
+            aria-label={
+              menuOpen ? "Close navigation menu" : "Open navigation menu"
+            }
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? (
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="m6 6 12 12M18 6 6 18"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 6h16M4 12h16M4 18h16"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+              </svg>
+            )}
+          </button>
+        </div>
       </nav>
 
+      {/* Mobile dropdown: cart is intentionally excluded */}
       {menuOpen && (
         <div
           ref={menuRef}
-          className="absolute right-4 top-full z-50 mt-2 flex w-64 flex-col gap-1 rounded-xl border border-[#e8dfd2] bg-white p-3 text-[#402b20] shadow-xl md:hidden"
+          className="absolute right-3 top-full z-50 mt-2 flex w-64 flex-col gap-1 rounded-xl border border-[#e8dfd2] bg-white p-3 text-[#402b20] shadow-xl md:hidden"
         >
           {links.map((link) => {
             const active = isActive(link.href);
@@ -215,12 +295,6 @@ export default function Navbar() {
                   <NavIcon name={link.name} />
                   {link.name}
                 </span>
-
-                {link.href === "/cart" && cartCount > 0 && (
-                  <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-[#d4af6a] px-1.5 text-xs font-bold text-[#402b20]">
-                    {cartCount}
-                  </span>
-                )}
               </Link>
             );
           })}
