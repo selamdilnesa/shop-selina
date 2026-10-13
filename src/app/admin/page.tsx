@@ -440,52 +440,7 @@ export default function AdminPage() {
   }
 
   // Delete a category.
-  async function handleDeleteCategory(category: Category) {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${category.name}"?`
-    );
-
-    if (!confirmed) return;
-
-    setSaving(true);
-    setError("");
-    setSuccessMessage("");
-
-    try {
-      await deleteCategory(category.id);
-
-      setCategories((currentCategories) =>
-        currentCategories.filter((item) => item.id !== category.id)
-      );
-
-      if (editingCategory?.id === category.id) {
-        resetCategoryForm();
-      }
-
-      setSuccessMessage("Category deleted successfully!");
-    } catch (error) {
-      console.error("Delete category error:", error);
-
-      const message =
-        error instanceof Error ? error.message : "";
-
-      if (
-        message.includes("FOREIGN KEY") ||
-        message.includes("SQLITE_CONSTRAINT_FOREIGNKEY")
-      ) {
-        setError(
-          "This category cannot be deleted because products or other records still reference it."
-        );
-      } else {
-        setError(
-          message ||
-            "Unable to delete this category. Please try again."
-        );
-      }
-    } finally {
-      setSaving(false);
-    }
-  }
+  async function handleDeleteCategory(category: Category) { const confirmed = window.confirm( `Are you sure you want to delete "${category.name}"?` ); if (!confirmed) return; setSaving(true); setError(""); setSuccessMessage(""); try { await deleteCategory(category.id); setCategories((currentCategories) => currentCategories.filter((item) => item.id !== category.id) ); if (editingCategory?.id === category.id) { resetCategoryForm(); } setSuccessMessage("Category deleted successfully!"); } catch (error) { const message = error instanceof Error ? error.message : ""; if ( /FOREIGN KEY|SQLITE_CONSTRAINT_FOREIGNKEY/i.test(message) ) { setError( `"${category.name}" cannot be deleted because existing products or other records still use it. The category has been kept safe.` ); } else { console.error("Delete category error:", error); setError( message || "Unable to delete this category. Please try again." ); } } finally { setSaving(false); } }
 
     // Search, filter, and sort products.
   const filteredProducts = products
@@ -512,11 +467,22 @@ export default function AdminPage() {
 
       return 0;
     });
+   
+
+      // Remove duplicate accounts using each user's email.
+  const uniqueUsers = Array.from(
+    new Map(
+      users.map((user) => [
+        user.email?.trim().toLowerCase() || `id:${user.id}`,
+        user,
+      ])
+    ).values()
+  );
 
   const stats = [
     { title: "Total Products", value: products.length, icon: "🛍️" },
     { title: "Total Categories", value: categories.length, icon: "📂" },
-    { title: "Total Users", value: users.length, icon: "👥" },
+    { title: "Total Users", value: uniqueUsers.length, icon: "👥" },
     { title: "Total Orders", value: orders.length, icon: "📦" },
   ];
 
@@ -587,16 +553,21 @@ export default function AdminPage() {
                   key={item.name}
                   type="button"
                   onClick={() => {
-                    setActiveTab(item.name);
-                    resetProductForm();
-                    resetCategoryForm();
-                    setSuccessMessage("");
-                    setError("");
+                 if (item.name === "Categories") {
+            window.location.href = "/admin/categories";
+             return;
+              }
 
-                    if (item.name === "Orders") {
-                      loadOrders();
-                    }
-                  }}
+                setActiveTab(item.name);
+                resetProductForm();
+                resetCategoryForm();
+                setSuccessMessage("");
+                setError("");
+
+                if (item.name === "Orders") {
+                  loadOrders();
+                }
+              }}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
                     activeTab === item.name
                       ? "bg-[#402b20] text-white"
@@ -1152,7 +1123,7 @@ export default function AdminPage() {
                   <p className="py-8 text-center text-[#806f63]">
                     Loading users...
                   </p>
-                ) : users.length === 0 ? (
+                ) : uniqueUsers.length === 0 ? (
                   <p className="py-8 text-center text-[#806f63]">
                     No users found.
                   </p>
@@ -1167,7 +1138,7 @@ export default function AdminPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {users.map((user) => (
+                        {uniqueUsers.map((user) => (
                           <tr
                             key={user.id}
                             className="border-b border-[#f0e8dc] last:border-0"

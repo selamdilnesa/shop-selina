@@ -66,19 +66,12 @@ async function apiRequest<T>(
   });
 
   if (!response.ok) {
-    const errorDetails = await response.text();
+  const errorDetails = await response.text();
 
-    console.error(
-      "API Error:",
-      response.status,
-      errorDetails
-    );
-
-    throw new Error(
-      `Request failed (${response.status}): ${errorDetails}`
-    );
-  }
-
+  throw new Error(
+    `API request failed (${response.status}): ${errorDetails}`
+  );
+}
   if (response.status === 204) {
     return undefined as T;
   }
