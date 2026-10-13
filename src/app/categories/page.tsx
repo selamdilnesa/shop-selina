@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Navbar from "@/components/ui/Navbar";
+import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { getCategories, Category } from "@/services/productService";
 
@@ -32,7 +32,7 @@ export default function CategoriesPage() {
 
   return (
     <div className="min-h-screen bg-[#faf7f2] text-[#402b20]">
-      <Navbar />
+      
 
       <main className="mx-auto max-w-6xl px-6 py-12">
         <h1 className="text-3xl font-bold tracking-tight">Our Categories</h1>

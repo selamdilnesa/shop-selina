@@ -10,6 +10,11 @@ type Product = {
   };
 };
 
+type Category = {
+  id: number;
+  name: string;
+};
+
 async function getFeaturedProducts(): Promise<Product[]> {
   try {
     const response = await fetch(
@@ -17,9 +22,7 @@ async function getFeaturedProducts(): Promise<Product[]> {
       { next: { revalidate: 3600 } }
     );
 
-    if (!response.ok) {
-      return [];
-    }
+    if (!response.ok) return [];
 
     const products: Product[] = await response.json();
 
@@ -31,7 +34,7 @@ async function getFeaturedProducts(): Promise<Product[]> {
         product.images?.some(
           (image) =>
             typeof image === "string" &&
-            image.startsWith("http") &&
+            /^https?:\/\/\S+$/i.test(image.trim()) &&
             !image.includes("placeimg.com") &&
             !image.includes("placehold.co")
         )
@@ -41,12 +44,36 @@ async function getFeaturedProducts(): Promise<Product[]> {
   }
 }
 
+async function getCategories(): Promise<Category[]> {
+  try {
+    const response = await fetch(
+      "https://api.escuelajs.co/api/v1/categories?limit=4",
+      { next: { revalidate: 3600 } }
+    );
+
+    if (!response.ok) return [];
+
+    const categories: Category[] = await response.json();
+
+    return categories.filter(
+      (category) =>
+        typeof category.id === "number" &&
+        typeof category.name === "string" &&
+        category.name.trim().length > 0
+    );
+  } catch {
+    return [];
+  }
+}
+
 export default async function Home() {
-  const products = await getFeaturedProducts();
+  const [products, categories] = await Promise.all([
+    getFeaturedProducts(),
+    getCategories(),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col bg-[#faf7f2]">
-      {/* Hero Section */}
       <main className="flex flex-col items-center justify-center gap-4 px-4 py-16 text-center sm:py-24">
         <p className="text-sm uppercase tracking-widest text-amber-950">
           Welcome to
@@ -90,7 +117,70 @@ export default async function Home() {
         </p>
       </main>
 
-      {/* Featured Products Section */}
+      <section className="px-4 pb-16 sm:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="mb-2 text-xs uppercase tracking-[0.25em] text-amber-800">
+                Find your favorites
+              </p>
+
+              <h2 className="font-serif text-3xl text-amber-950 sm:text-4xl">
+                Shop by Category
+              </h2>
+
+              <p className="mt-3 text-sm text-stone-600 sm:text-base">
+                A little something for every part of your life.
+              </p>
+            </div>
+
+            <Link
+              href="/categories"
+              className="w-fit border-b border-amber-800 pb-1 text-sm font-medium text-amber-950 transition hover:text-amber-700"
+            >
+              Explore All Categories →
+            </Link>
+          </div>
+
+          {categories.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
+              {categories.map((category) => (
+                <Link
+               key={category.id}
+              href={"/categories/" + category.id}
+              className="group flex min-h-36 items-center justify-center rounded-2xl border border-[#e8dfd2] bg-white p-5 text-center transition duration-300 hover:-translate-y-1 hover:border-[#d4af6a] hover:shadow-lg sm:min-h-44 sm:p-7"
+              >
+                  <div>
+                    <div className="mx-auto mb-4 h-px w-10 bg-[#d4af6a] transition-all duration-300 group-hover:w-16" />
+
+                    <h3 className="text-base font-medium capitalize text-[#402b20] transition group-hover:text-amber-700 sm:text-lg">
+                      {category.name}
+                    </h3>
+
+                    <p className="mt-3 text-xs text-stone-500">
+                      Discover the collection →
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-[#e8dfd2] bg-white p-8 text-center">
+              <p className="text-sm text-stone-600">
+                Categories are temporarily unavailable.
+              </p>
+
+              <Link
+                href="/categories"
+                className="mt-3 inline-block text-sm font-medium text-amber-950 underline underline-offset-4"
+              >
+                Browse Categories →
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+
       <section className="px-4 pb-16 sm:px-8 sm:pb-24">
         <div className="mx-auto max-w-7xl">
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -122,7 +212,7 @@ export default async function Home() {
                 const productImage = product.images?.find(
                   (image) =>
                     typeof image === "string" &&
-                    image.startsWith("http") &&
+                    /^https?:\/\/\S+$/i.test(image.trim()) &&
                     !image.includes("placeimg.com") &&
                     !image.includes("placehold.co")
                 );

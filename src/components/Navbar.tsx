@@ -94,7 +94,7 @@ export default function Navbar() {
   const links = [
     { name: "Home", href: "/" },
     { name: "Products", href: "/products" },
-    { name: "Categories", href: "/category" },
+    { name: "Categories", href: "/categories" },
     accountLink,
   ];
 
