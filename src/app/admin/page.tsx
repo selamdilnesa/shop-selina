@@ -42,6 +42,9 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("Overview");
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [productSearch, setProductSearch] = useState("");
+  const [productCategoryFilter, setProductCategoryFilter] = useState("all");
+  const [productSort, setProductSort] = useState("default");
   const [categories, setCategories] = useState<Category[]>([]);
   const [users, setUsers] = useState<StoreUser[]>([]);
   const [orders, setOrders] = useState<ManagedOrder[]>([]);
@@ -484,6 +487,32 @@ export default function AdminPage() {
     }
   }
 
+    // Search, filter, and sort products.
+  const filteredProducts = products
+    .filter((product) =>
+      product.title.toLowerCase().includes(productSearch.toLowerCase())
+    )
+    .filter((product) =>
+      productCategoryFilter === "all"
+        ? true
+        : String(product.category?.id) === productCategoryFilter
+    )
+    .sort((a, b) => {
+      if (productSort === "price-low") {
+        return Number(a.price) - Number(b.price);
+      }
+
+      if (productSort === "price-high") {
+        return Number(b.price) - Number(a.price);
+      }
+
+      if (productSort === "name") {
+        return a.title.localeCompare(b.title);
+      }
+
+      return 0;
+    });
+
   const stats = [
     { title: "Total Products", value: products.length, icon: "🛍️" },
     { title: "Total Categories", value: categories.length, icon: "📂" },
@@ -682,6 +711,48 @@ export default function AdminPage() {
             {/* Products */}
             {activeTab === "Products" && (
               <div>
+              {/* Product search and filters */}
+                <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <input
+                    type="search"
+                    value={productSearch}
+                    onChange={(event) =>
+                      setProductSearch(event.target.value)
+                    }
+                    placeholder="Search products..."
+                    aria-label="Search products"
+                    className={inputStyle}
+                  />
+
+                  <select
+                    value={productCategoryFilter}
+                    onChange={(event) =>
+                      setProductCategoryFilter(event.target.value)
+                    }
+                    aria-label="Filter products by category"
+                    className={inputStyle}
+                  >
+                    <option value="all">All categories</option>
+
+                    {categories.map((category) => (
+                      <option key={category.id} value={String(category.id)}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={productSort}
+                    onChange={(event) => setProductSort(event.target.value)}
+                    aria-label="Sort products"
+                    className={inputStyle}
+                  >
+                    <option value="default">Default order</option>
+                    <option value="name">Name: A–Z</option>
+                    <option value="price-low">Price: Low to high</option>
+                    <option value="price-high">Price: High to low</option>
+                  </select>
+                </div>
                 {showAddProduct && (
                   <form
                     onSubmit={handleSaveProduct}

@@ -1,5 +1,7 @@
-const API_URL = "https://api.escuelajs.co/api/v1";
-
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://api.escuelajs.co/api/v1"
+).replace(/\/+$/, "");
 
 export type Product = {
   id: number;
@@ -22,7 +24,6 @@ export type NewProduct = {
   images: string[];
 };
 
-
 export type Category = {
   id: number;
   name: string;
@@ -34,7 +35,6 @@ export type NewCategory = {
   image: string;
 };
 
-
 export type StoreUser = {
   id: number;
   name: string;
@@ -43,28 +43,41 @@ export type StoreUser = {
   avatar: string;
 };
 
+
 async function apiRequest<T>(
   endpoint: string,
   options?: RequestInit
 ): Promise<T> {
+  const headers = new Headers(options?.headers);
+
+  
+  if (
+    options?.body &&
+    !(options.body instanceof FormData) &&
+    !headers.has("Content-Type")
+  ) {
+    headers.set("Content-Type", "application/json");
+  }
+
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
+    headers,
     cache: "no-store",
   });
 
-      if (!response.ok) {
-  const errorDetails = await response.text();
+  if (!response.ok) {
+    const errorDetails = await response.text();
 
-  console.error("API Error:", response.status, errorDetails);
+    console.error(
+      "API Error:",
+      response.status,
+      errorDetails
+    );
 
-  throw new Error(
-    `Request failed (${response.status}): ${errorDetails}`
-  );
-} 
+    throw new Error(
+      `Request failed (${response.status}): ${errorDetails}`
+    );
+  }
 
   if (response.status === 204) {
     return undefined as T;
@@ -73,6 +86,7 @@ async function apiRequest<T>(
   return response.json();
 }
 
+// PRODUCTS
 
 export function getProducts(): Promise<Product[]> {
   return apiRequest<Product[]>("/products");
@@ -102,7 +116,6 @@ export function updateProduct(
     body: JSON.stringify(product),
   });
 }
-
 export function deleteProduct(id: number): Promise<void> {
   return apiRequest<void>(`/products/${id}`, {
     method: "DELETE",
@@ -110,6 +123,55 @@ export function deleteProduct(id: number): Promise<void> {
 }
 
 
+export async function uploadProductImage(
+  file: File
+): Promise<string> {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Please select a valid image file.");
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error("The image must be smaller than 5 MB.");
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API_URL}/files/upload`, {
+    method: "POST",
+    body: formData,
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+
+    console.error("Image upload error:", response.status, details);
+
+    throw new Error(
+      `Image upload failed (${response.status}). ${
+        details || "Please try again."
+      }`
+    );
+  }
+
+  const result: {
+    location?: string;
+    url?: string;
+  } = await response.json();
+
+  const imageUrl = result.location || result.url;
+
+  if (!imageUrl) {
+    throw new Error(
+      "The upload API did not return a public image URL."
+    );
+  }
+
+  return imageUrl;
+}
+
+// CATEGORIES
 
 export function getCategories(): Promise<Category[]> {
   return apiRequest<Category[]>("/categories");
@@ -140,7 +202,7 @@ export function deleteCategory(id: number): Promise<void> {
   });
 }
 
-
+// USERS
 
 export function getUsers(): Promise<StoreUser[]> {
   return apiRequest<StoreUser[]>("/users");
