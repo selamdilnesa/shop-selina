@@ -3,6 +3,11 @@ const API_URL = (
   "https://api.escuelajs.co/api/v1"
 ).replace(/\/+$/, "");
 
+// Local storage keys for Shop Selina demo data
+const PRODUCTS_KEY = "shop-selina-demo-products-v1";
+const CATEGORIES_KEY = "shop-selina-demo-categories-v1";
+
+
 export type Product = {
   id: number;
   title: string;
@@ -43,6 +48,10 @@ export type StoreUser = {
   avatar: string;
 };
 
+// ==================== API REQUEST ====================
+
+// This helper is used for reading data from the API.
+// Demo product/category changes will NOT use API mutation requests.
 
 async function apiRequest<T>(
   endpoint: string,
@@ -50,11 +59,9 @@ async function apiRequest<T>(
 ): Promise<T> {
   const headers = new Headers(options?.headers);
 
-  
   if (
     options?.body &&
-    !(options.body instanceof FormData) &&
-    !headers.has("Content-Type")
+    !(options.body instanceof FormData)
   ) {
     headers.set("Content-Type", "application/json");
   }
@@ -66,159 +73,368 @@ async function apiRequest<T>(
   });
 
   if (!response.ok) {
-  const errorDetails = await response.text();
+    const errorDetails = await response.text();
 
-  throw new Error(
-    `API request failed (${response.status}): ${errorDetails}`
-  );
-}
+    throw new Error(
+      `API request failed (${response.status}): ${errorDetails}`
+    );
+  }
+
   if (response.status === 204) {
     return undefined as T;
   }
 
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
-// PRODUCTS
 
-export function getProducts(): Promise<Product[]> {
-  return apiRequest<Product[]>("/products");
+
+function readLocalData<T>(key: string): T[] | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const savedData = localStorage.getItem(key);
+
+  if (savedData === null) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(savedData) as T[];
+  } catch {
+    throw new Error(
+      `Could not read saved Shop Selina data for ${key}.`
+    );
+  }
 }
 
-export function getProductById(
+function saveLocalData<T>(key: string, data: T[]): void {
+  if (typeof window === "undefined") {
+    throw new Error(
+      "Local demo changes can only be saved in the browser."
+    );
+  }
+
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch {
+    throw new Error(
+      "Could not save your changes in the browser. Storage may be full."
+    );
+  }
+}
+
+function getNextId<T extends { id: number }>(
+  items: T[]
+): number {
+  return items.reduce(
+    (highest, item) => Math.max(highest, item.id),
+    0
+  ) + 1;
+}
+
+// products
+
+export async function getProducts(): Promise<Product[]> {
+  const savedProducts = readLocalData<Product>(PRODUCTS_KEY);
+
+  if (savedProducts !== null) {
+    return savedProducts;
+  }
+
+  const products = await apiRequest<Product[]>("/products");
+
+  saveLocalData(PRODUCTS_KEY, products);
+
+  return products;
+}
+
+export async function getProductById(
   id: number
 ): Promise<Product> {
-  return apiRequest<Product>(`/products/${id}`);
+  const products = await getProducts();
+
+  const product = products.find((item) => item.id === id);
+
+  if (!product) {
+    throw new Error("Product not found.");
+  }
+
+  return product;
 }
 
-export function createProduct(
+// Create a product locally.
+
+export async function createProduct(
   product: NewProduct
 ): Promise<Product> {
-  return apiRequest<Product>("/products/", {
-    method: "POST",
-    body: JSON.stringify(product),
-  });
+  const [products, categories] = await Promise.all([
+    getProducts(),
+    getCategories(),
+  ]);
+
+  const category = categories.find(
+    (item) => item.id === product.categoryId
+  );
+
+  if (!category) {
+    throw new Error(
+      "Category not found. Please select a valid category."
+    );
+  }
+
+  const newProduct: Product = {
+    id: getNextId(products),
+    title: product.title,
+    price: product.price,
+    description: product.description,
+    images: product.images,
+    category,
+  };
+
+  saveLocalData(PRODUCTS_KEY, [
+    ...products,
+    newProduct,
+  ]);
+
+  return newProduct;
 }
 
-export function updateProduct(
+// Update a product locally.
+
+export async function updateProduct(
   id: number,
-  product: Partial<NewProduct>
+  updates: Partial<NewProduct>
 ): Promise<Product> {
-  return apiRequest<Product>(`/products/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(product),
-  });
-}
-export function deleteProduct(id: number): Promise<void> {
-  return apiRequest<void>(`/products/${id}`, {
-    method: "DELETE",
-  });
+  const [products, categories] = await Promise.all([
+    getProducts(),
+    getCategories(),
+  ]);
+
+  const existingProduct = products.find(
+    (item) => item.id === id
+  );
+
+  if (!existingProduct) {
+    throw new Error("Product not found.");
+  }
+
+  let updatedCategory = existingProduct.category;
+
+  if (updates.categoryId !== undefined) {
+    const category = categories.find(
+      (item) => item.id === updates.categoryId
+    );
+
+    if (!category) {
+      throw new Error(
+        "Category not found. Please select a valid category."
+      );
+    }
+
+    updatedCategory = category;
+  }
+
+  const updatedProduct: Product = {
+    ...existingProduct,
+    ...(updates.title !== undefined && {
+      title: updates.title,
+    }),
+    ...(updates.price !== undefined && {
+      price: updates.price,
+    }),
+    ...(updates.description !== undefined && {
+      description: updates.description,
+    }),
+    ...(updates.images !== undefined && {
+      images: updates.images,
+    }),
+    category: updatedCategory,
+  };
+
+  const updatedProducts = products.map((item) =>
+    item.id === id ? updatedProduct : item
+  );
+
+  saveLocalData(PRODUCTS_KEY, updatedProducts);
+
+  return updatedProduct;
 }
 
+// Delete a product locally.
 
+export async function deleteProduct(
+  id: number
+): Promise<void> {
+  const products = await getProducts();
+
+  const exists = products.some((item) => item.id === id);
+
+  if (!exists) {
+    throw new Error("Product not found.");
+  }
+
+  const updatedProducts = products.filter(
+    (item) => item.id !== id
+  );
+
+  saveLocalData(PRODUCTS_KEY, updatedProducts);
+}
+
+// product image
 export async function uploadProductImage(
-  file: File
+  _file: File
 ): Promise<string> {
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Please select a valid image file.");
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error("The image must be smaller than 5 MB.");
-  }
-
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const response = await fetch(`${API_URL}/files/upload`, {
-    method: "POST",
-    body: formData,
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    const details = await response.text();
-
-    console.error("Image upload error:", response.status, details);
-
-    throw new Error(
-      `Image upload failed (${response.status}). ${
-        details || "Please try again."
-      }`
-    );
-  }
-
-  const result: {
-    location?: string;
-    url?: string;
-  } = await response.json();
-
-  const imageUrl = result.location || result.url;
-
-  if (!imageUrl) {
-    throw new Error(
-      "The upload API did not return a public image URL."
-    );
-  }
-
-  return imageUrl;
+  throw new Error(
+    "Image uploads are disabled in safe demo mode. Please use a public image URL."
+  );
 }
 
-// CATEGORIES
+// categories
+export async function getCategories(): Promise<Category[]> {
+  const savedCategories =
+    readLocalData<Category>(CATEGORIES_KEY);
 
-export function getCategories(): Promise<Category[]> {
-  return apiRequest<Category[]>("/categories");
+  if (savedCategories !== null) {
+    return savedCategories;
+  }
+
+  const categories =
+    await apiRequest<Category[]>("/categories");
+
+  saveLocalData(CATEGORIES_KEY, categories);
+
+  return categories;
 }
 
-export function createCategory(
+// Create a category locally.
+
+
+export async function createCategory(
   category: NewCategory
 ): Promise<Category> {
-  return apiRequest<Category>("/categories/", {
-    method: "POST",
-    body: JSON.stringify(category),
-  });
+  const categories = await getCategories();
+
+  const newCategory: Category = {
+    id: getNextId(categories),
+    name: category.name,
+    image: category.image,
+  };
+
+  saveLocalData(CATEGORIES_KEY, [
+    ...categories,
+    newCategory,
+  ]);
+
+  return newCategory;
 }
 
-export function updateCategory(
+// Update a category locally.
+
+export async function updateCategory(
   id: number,
-  category: Partial<NewCategory>
+  updates: Partial<NewCategory>
 ): Promise<Category> {
-  return apiRequest<Category>(`/categories/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(category),
+  const [categories, products] = await Promise.all([
+    getCategories(),
+    getProducts(),
+  ]);
+
+  const existingCategory = categories.find(
+    (item) => item.id === id
+  );
+
+  if (!existingCategory) {
+    throw new Error("Category not found.");
+  }
+
+  const updatedCategory: Category = {
+    ...existingCategory,
+    ...updates,
+  };
+
+  const updatedCategories = categories.map((item) =>
+    item.id === id ? updatedCategory : item
+  );
+
+  const updatedProducts = products.map((product) => {
+    if (product.category.id !== id) {
+      return product;
+    }
+
+    return {
+      ...product,
+      category: updatedCategory,
+    };
   });
+
+  saveLocalData(CATEGORIES_KEY, updatedCategories);
+  saveLocalData(PRODUCTS_KEY, updatedProducts);
+
+  return updatedCategory;
 }
 
-export function deleteCategory(id: number): Promise<void> {
-  return apiRequest<void>(`/categories/${id}`, {
-    method: "DELETE",
-  });
+// Delete a category locally.
+
+export async function deleteCategory(
+  id: number
+): Promise<void> {
+  const [categories, products] = await Promise.all([
+    getCategories(),
+    getProducts(),
+  ]);
+
+  const exists = categories.some(
+    (item) => item.id === id
+  );
+
+  if (!exists) {
+    throw new Error("Category not found.");
+  }
+
+  const categoryIsUsed = products.some(
+    (product) => product.category.id === id
+  );
+
+  if (categoryIsUsed) {
+    throw new Error(
+      "FOREIGN KEY constraint failed: this category is used by existing products. Move or delete those products first."
+    );
+  }
+
+  const updatedCategories = categories.filter(
+    (item) => item.id !== id
+  );
+
+  saveLocalData(CATEGORIES_KEY, updatedCategories);
 }
 
-// USERS
+// users
 
-export function getUsers(): Promise<StoreUser[]> {
+export async function getUsers(): Promise<StoreUser[]> {
   return apiRequest<StoreUser[]>("/users");
 }
 
-export function getUserById(
+export async function getUserById(
   id: number
 ): Promise<StoreUser> {
   return apiRequest<StoreUser>(`/users/${id}`);
 }
-
-export function updateUser(
-  id: number,
-  user: Partial<StoreUser>
-): Promise<StoreUser> {
-  return apiRequest<StoreUser>(`/users/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(user),
-  });
+// block user change
+export async function updateUser(
+  _id: number,
+  _user: Partial<StoreUser>
+): Promise<never> {
+  throw new Error(
+    "Editing shared API users is disabled to protect existing accounts."
+  );
 }
 
-export function deleteUser(id: number): Promise<void> {
-  return apiRequest<void>(`/users/${id}`, {
-    method: "DELETE",
-  });
+export async function deleteUser(
+  _id: number
+): Promise<never> {
+  throw new Error(
+    "Deleting shared API users is disabled to protect existing accounts."
+  );
 }

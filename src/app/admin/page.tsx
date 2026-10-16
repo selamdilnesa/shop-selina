@@ -17,7 +17,6 @@ import {
   type Category,
   type StoreUser,
 } from "@/services/productService";
-
 import { getOrders, type DemoOrder } from "@/lib/orders";
 
 const menuItems = [
@@ -36,7 +35,6 @@ type ManagedOrder = DemoOrder & {
 
 const ORDER_STATUS_KEY = "shop-selina-order-statuses";
 const ORDERS_STORAGE_KEY = "shop-selina-orders";
-
 const inputStyle =
   "w-full rounded-lg border border-[#eadfce] bg-white px-4 py-3 text-sm text-[#402b20] outline-none focus:border-[#a78655]";
 
@@ -51,49 +49,34 @@ export default function AdminPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [users, setUsers] = useState<StoreUser[]>([]);
   const [orders, setOrders] = useState<ManagedOrder[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAddCategory, setShowAddCategory] = useState(false);
-
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(
-    null
-  );
-
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("1");
   const [imageUrl, setImageUrl] = useState("");
-
   const [categoryName, setCategoryName] = useState("");
   const [categoryImage, setCategoryImage] = useState("");
 
-  // Load orders stored in this browser.
   function loadOrders() {
     try {
       const savedOrders = getOrders();
-
       let savedStatuses: Record<string, OrderStatus> = {};
-
       try {
         const storedStatuses = localStorage.getItem(ORDER_STATUS_KEY);
-
         if (storedStatuses) {
-          savedStatuses = JSON.parse(storedStatuses) as Record<
-            string,
-            OrderStatus
-          >;
+          savedStatuses = JSON.parse(storedStatuses) as Record<string, OrderStatus>;
         }
       } catch {
         savedStatuses = {};
       }
-
       setOrders(
         savedOrders.map((order) => ({
           ...order,
@@ -105,33 +88,19 @@ export default function AdminPage() {
     }
   }
 
-  // Update an order's status.
-  function handleStatusChange(
-    orderNumber: string,
-    status: OrderStatus
-  ) {
+  function handleStatusChange(orderNumber: string, status: OrderStatus) {
     try {
       const storedStatuses = localStorage.getItem(ORDER_STATUS_KEY);
-
       const savedStatuses = storedStatuses
         ? (JSON.parse(storedStatuses) as Record<string, OrderStatus>)
         : {};
-
       savedStatuses[orderNumber] = status;
-
-      localStorage.setItem(
-        ORDER_STATUS_KEY,
-        JSON.stringify(savedStatuses)
-      );
-
+      localStorage.setItem(ORDER_STATUS_KEY, JSON.stringify(savedStatuses));
       setOrders((currentOrders) =>
         currentOrders.map((order) =>
-          order.orderNumber === orderNumber
-            ? { ...order, status }
-            : order
+          order.orderNumber === orderNumber ? { ...order, status } : order
         )
       );
-
       setSuccessMessage(`Order ${orderNumber} updated to ${status}.`);
       setError("");
     } catch {
@@ -139,132 +108,92 @@ export default function AdminPage() {
     }
   }
 
-  // Remove all orders currently marked as Delivered.
   function handleClearDeliveredOrders() {
-    const deliveredOrders = orders.filter(
-      (order) => order.status === "Delivered"
-    );
-
+    const deliveredOrders = orders.filter((order) => order.status === "Delivered");
     if (deliveredOrders.length === 0) {
       setError("");
       setSuccessMessage("There are no delivered orders to clear.");
       return;
     }
-
     const confirmed = window.confirm(
       `Are you sure you want to remove all ${deliveredOrders.length} delivered order(s)? Pending, Processing, and Shipped orders will remain.`
     );
-
     if (!confirmed) return;
-
     try {
       const deliveredOrderNumbers = new Set(
         deliveredOrders.map((order) => order.orderNumber)
       );
-
       const savedOrders = getOrders();
       const remainingSavedOrders = savedOrders.filter(
         (order) => !deliveredOrderNumbers.has(order.orderNumber)
       );
-
-      // Update the original order list in localStorage.
-      localStorage.setItem(
-        ORDERS_STORAGE_KEY,
-        JSON.stringify(remainingSavedOrders)
-      );
-
-      // Remove status entries for the deleted orders only.
+      localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(remainingSavedOrders));
       const storedStatuses = localStorage.getItem(ORDER_STATUS_KEY);
       const savedStatuses = storedStatuses
         ? (JSON.parse(storedStatuses) as Record<string, OrderStatus>)
         : {};
-
       deliveredOrderNumbers.forEach((orderNumber) => {
         delete savedStatuses[orderNumber];
       });
-
-      localStorage.setItem(
-        ORDER_STATUS_KEY,
-        JSON.stringify(savedStatuses)
-      );
-
+      localStorage.setItem(ORDER_STATUS_KEY, JSON.stringify(savedStatuses));
       setOrders((currentOrders) =>
         currentOrders.filter((order) => order.status !== "Delivered")
       );
       setError("");
-      setSuccessMessage(
-        `${deliveredOrders.length} delivered order(s) cleared successfully.`
-      );
+      setSuccessMessage(`${deliveredOrders.length} delivered order(s) cleared successfully.`);
     } catch {
       setError("Unable to clear delivered orders. Please try again.");
       setSuccessMessage("");
     }
   }
 
-  // Load dashboard data.
   async function loadDashboard() {
     setLoading(true);
     setError("");
-
     try {
       const results = await Promise.allSettled([
         getProducts(),
         getCategories(),
         getUsers(),
       ]);
-
       if (results[0].status === "fulfilled") {
         setProducts(results[0].value);
       }
-
       if (results[1].status === "fulfilled") {
         setCategories(results[1].value);
       }
-
       if (results[2].status === "fulfilled") {
         setUsers(results[2].value);
       }
-
       if (results.some((result) => result.status === "rejected")) {
-        setError(
-          "Some dashboard data could not be loaded. Please try refreshing."
-        );
+        setError("Some dashboard data could not be loaded. Please try refreshing.");
       }
-
       loadOrders();
     } finally {
       setLoading(false);
     }
   }
 
- 
-useEffect(() => {
-  if (authLoading) return;
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
+    if (user.role !== "admin") {
+      router.replace("/");
+      return;
+    }
+    void loadDashboard();
+    function handleStorageChange() {
+      loadOrders();
+    }
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [authLoading, user, router]);
 
-  if (!user) {
-    router.replace("/login");
-    return;
-  }
-
-  if (user.role !== "admin") {
-    router.replace("/");
-    return;
-  }
-
-  void loadDashboard();
-
-  function handleStorageChange() {
-    loadOrders();
-  }
-
-  window.addEventListener("storage", handleStorageChange);
-
-  return () => {
-    window.removeEventListener("storage", handleStorageChange);
-  };
-}, [authLoading, user, router]);
-
-  // Reset the product form.
   function resetProductForm() {
     setTitle("");
     setPrice("");
@@ -275,7 +204,6 @@ useEffect(() => {
     setShowAddProduct(false);
   }
 
-  // Prepare a product for editing.
   function startEditProduct(product: Product) {
     setEditingProduct(product);
     setTitle(product.title);
@@ -290,30 +218,23 @@ useEffect(() => {
     setSuccessMessage("");
   }
 
-  // Add or update a product.
   async function handleSaveProduct(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     if (!title.trim() || !description.trim() || !imageUrl.trim()) {
       setError("Please complete all product fields.");
       return;
     }
-
     const numericPrice = Number(price);
-
     if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
       setError("Please enter a valid price greater than zero.");
       return;
     }
-
     setSaving(true);
     setError("");
     setSuccessMessage("");
-
     const selectedCategory = categories.find(
       (category) => category.id === Number(categoryId)
     );
-
     const productData = {
       title: title.trim(),
       price: numericPrice,
@@ -321,14 +242,9 @@ useEffect(() => {
       categoryId: Number(categoryId),
       images: [imageUrl.trim()],
     };
-
     try {
       if (editingProduct) {
-        const updatedProduct = await updateProduct(
-          editingProduct.id,
-          productData
-        );
-
+        const updatedProduct = await updateProduct(editingProduct.id, productData);
         setProducts((currentProducts) =>
           currentProducts.map((product) =>
             product.id === editingProduct.id
@@ -344,11 +260,9 @@ useEffect(() => {
               : product
           )
         );
-
         setSuccessMessage("Product updated successfully!");
       } else {
         const createdProduct = await createProduct(productData);
-
         setProducts((currentProducts) => [
           {
             ...createdProduct,
@@ -360,14 +274,11 @@ useEffect(() => {
           },
           ...currentProducts,
         ]);
-
         setSuccessMessage("Product added successfully!");
       }
-
       resetProductForm();
     } catch (error) {
       console.error("Save product error:", error);
-
       setError(
         error instanceof Error
           ? error.message
@@ -378,33 +289,23 @@ useEffect(() => {
     }
   }
 
-  // Delete a product.
   async function handleDeleteProduct(product: Product) {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${product.title}"?`
-    );
-
+    const confirmed = window.confirm(`Are you sure you want to delete "${product.title}"?`);
     if (!confirmed) return;
-
     setSaving(true);
     setError("");
     setSuccessMessage("");
-
     try {
       await deleteProduct(product.id);
-
       setProducts((currentProducts) =>
         currentProducts.filter((item) => item.id !== product.id)
       );
-
       if (editingProduct?.id === product.id) {
         resetProductForm();
       }
-
       setSuccessMessage("Product deleted successfully!");
     } catch (error) {
       console.error("Delete product error:", error);
-
       setError(
         error instanceof Error
           ? error.message
@@ -415,7 +316,6 @@ useEffect(() => {
     }
   }
 
-  // Prepare a category for editing.
   function startEditCategory(category: Category) {
     setEditingCategory(category);
     setCategoryName(category.name);
@@ -427,7 +327,6 @@ useEffect(() => {
     setSuccessMessage("");
   }
 
-  // Reset the category form.
   function resetCategoryForm() {
     setCategoryName("");
     setCategoryImage("");
@@ -435,78 +334,43 @@ useEffect(() => {
     setShowAddCategory(false);
   }
 
-  // Add or update a category.
-  async function handleSaveCategory(
-    event: FormEvent<HTMLFormElement>
-  ) {
+  async function handleSaveCategory(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const name = categoryName.trim();
     const image = categoryImage.trim();
-
     if (!name || !image) {
       setError("Please enter a category name and image URL.");
       return;
     }
-
     setSaving(true);
     setError("");
     setSuccessMessage("");
-
     try {
       if (editingCategory) {
-        const updatedCategory = await updateCategory(
-          editingCategory.id,
-          { name, image }
-        );
-
+        const updatedCategory = await updateCategory(editingCategory.id, { name, image });
         setCategories((currentCategories) =>
           currentCategories.map((category) =>
             category.id === editingCategory.id
-              ? {
-                  ...category,
-                  ...updatedCategory,
-                  name,
-                  image,
-                }
+              ? { ...category, ...updatedCategory, name, image }
               : category
           )
         );
-
         setProducts((currentProducts) =>
           currentProducts.map((product) =>
             product.category?.id === editingCategory.id
-              ? {
-                  ...product,
-                  category: {
-                    ...product.category,
-                    name,
-                    image,
-                  },
-                }
+              ? { ...product, category: { ...product.category, name, image } }
               : product
           )
         );
-
         setSuccessMessage("Category updated successfully!");
       } else {
-        const createdCategory = await createCategory({
-          name,
-          image,
-        });
-
-        setCategories((currentCategories) => [
-          createdCategory,
-          ...currentCategories,
-        ]);
-
+        const createdCategory = await createCategory({ name, image });
+        setCategories((currentCategories) => [createdCategory, ...currentCategories]);
         setSuccessMessage("Category added successfully!");
       }
-
       resetCategoryForm();
     } catch (error) {
       console.error("Save category error:", error);
-
       setError(
         error instanceof Error
           ? error.message
@@ -517,10 +381,36 @@ useEffect(() => {
     }
   }
 
-  // Delete a category.
-  async function handleDeleteCategory(category: Category) { const confirmed = window.confirm( `Are you sure you want to delete "${category.name}"?` ); if (!confirmed) return; setSaving(true); setError(""); setSuccessMessage(""); try { await deleteCategory(category.id); setCategories((currentCategories) => currentCategories.filter((item) => item.id !== category.id) ); if (editingCategory?.id === category.id) { resetCategoryForm(); } setSuccessMessage("Category deleted successfully!"); } catch (error) { const message = error instanceof Error ? error.message : ""; if ( /FOREIGN KEY|SQLITE_CONSTRAINT_FOREIGNKEY/i.test(message) ) { setError( `"${category.name}" cannot be deleted because existing products or other records still use it. The category has been kept safe.` ); } else { console.error("Delete category error:", error); setError( message || "Unable to delete this category. Please try again." ); } } finally { setSaving(false); } }
+  async function handleDeleteCategory(category: Category) {
+    const confirmed = window.confirm(`Are you sure you want to delete "${category.name}"?`);
+    if (!confirmed) return;
+    setSaving(true);
+    setError("");
+    setSuccessMessage("");
+    try {
+      await deleteCategory(category.id);
+      setCategories((currentCategories) =>
+        currentCategories.filter((item) => item.id !== category.id)
+      );
+      if (editingCategory?.id === category.id) {
+        resetCategoryForm();
+      }
+      setSuccessMessage("Category deleted successfully!");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "";
+      if (/FOREIGN KEY|SQLITE_CONSTRAINT_FOREIGNKEY/i.test(message)) {
+        setError(
+          `"${category.name}" cannot be deleted because existing products or other records still use it. The category has been kept safe.`
+        );
+      } else {
+        console.error("Delete category error:", error);
+        setError(message || "Unable to delete this category. Please try again.");
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
 
-    // Search, filter, and sort products.
   const filteredProducts = products
     .filter((product) =>
       product.title.toLowerCase().includes(productSearch.toLowerCase())
@@ -531,23 +421,12 @@ useEffect(() => {
         : String(product.category?.id) === productCategoryFilter
     )
     .sort((a, b) => {
-      if (productSort === "price-low") {
-        return Number(a.price) - Number(b.price);
-      }
-
-      if (productSort === "price-high") {
-        return Number(b.price) - Number(a.price);
-      }
-
-      if (productSort === "name") {
-        return a.title.localeCompare(b.title);
-      }
-
+      if (productSort === "price-low") return Number(a.price) - Number(b.price);
+      if (productSort === "price-high") return Number(b.price) - Number(a.price);
+      if (productSort === "name") return a.title.localeCompare(b.title);
       return 0;
     });
-   
 
-      // Remove duplicate accounts using each user's email.
   const uniqueUsers = Array.from(
     new Map(
       users.map((user) => [
@@ -563,21 +442,21 @@ useEffect(() => {
     { title: "Total Users", value: uniqueUsers.length, icon: "👥" },
     { title: "Total Orders", value: orders.length, icon: "📦" },
   ];
-if (authLoading) {
+
+  if (authLoading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#faf7f2] text-[#402b20]">
+        <p className="text-sm">Checking your access...</p>
+      </main>
+    );
+  }
+
+  if (!user || user.role !== "admin") {
+    return null;
+  }
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#faf7f2] text-[#402b20]">
-      <p className="text-sm">Checking your access...</p>
-    </main>
-  );
-}
-
-if (!user || user.role !== "admin") {
-  return null;
-}
-
-return (
-  <main className="min-h-screen bg-[#faf7f2] p-4 text-[#402b20] sm:p-8">
-    
+    <main className="min-h-screen bg-[#faf7f2] p-4 text-[#402b20] sm:p-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -585,11 +464,8 @@ return (
               Shop Selina
             </p>
             <h1 className="mt-2 text-3xl font-bold">Admin Dashboard</h1>
-            <p className="mt-2 text-sm text-[#806f63]">
-              Manage your store from one place.
-            </p>
+            <p className="mt-2 text-sm text-[#806f63]">Manage your store from one place.</p>
           </div>
-
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
@@ -601,7 +477,6 @@ return (
             >
               ↻ Refresh
             </button>
-
             <a
               href="/"
               className="rounded-lg border border-[#d4af6a] px-4 py-2 transition hover:bg-[#f0e5d4]"
@@ -611,7 +486,6 @@ return (
           </div>
         </header>
 
-        {/* Dashboard statistics */}
         <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <div
@@ -622,42 +496,31 @@ return (
                 <p className="text-sm text-[#806f63]">{stat.title}</p>
                 <span className="text-2xl">{stat.icon}</span>
               </div>
-
-              <h2 className="mt-4 text-3xl font-bold">
-                {loading ? "..." : stat.value}
-              </h2>
+              <h2 className="mt-4 text-3xl font-bold">{loading ? "..." : stat.value}</h2>
             </div>
           ))}
         </section>
 
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr]">
-          {/* Sidebar navigation */}
           <aside className="h-fit rounded-2xl border border-[#eadfce] bg-white p-4 shadow-sm">
             <h2 className="mb-4 px-3 text-xs font-semibold uppercase tracking-wider text-[#a78655]">
               Management
             </h2>
-
             <nav className="space-y-2">
               {menuItems.map((item) => (
                 <button
                   key={item.name}
                   type="button"
                   onClick={() => {
-                 if (item.name === "Categories") {
-            window.location.href = "/admin/categories";
-             return;
-              }
-
-                setActiveTab(item.name);
-                resetProductForm();
-                resetCategoryForm();
-                setSuccessMessage("");
-                setError("");
-
-                if (item.name === "Orders") {
-                  loadOrders();
-                }
-              }}
+                    setActiveTab(item.name);
+                    resetProductForm();
+                    resetCategoryForm();
+                    setSuccessMessage("");
+                    setError("");
+                    if (item.name === "Orders") {
+                      loadOrders();
+                    }
+                  }}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
                     activeTab === item.name
                       ? "bg-[#402b20] text-white"
@@ -671,12 +534,10 @@ return (
             </nav>
           </aside>
 
-          {/* Main dashboard content */}
           <section className="min-w-0 rounded-2xl border border-[#eadfce] bg-white p-6 shadow-sm sm:p-8">
             <div className="mb-6 border-b border-[#eadfce] pb-5">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <h2 className="text-2xl font-bold">{activeTab}</h2>
-
                 {activeTab === "Products" && (
                   <button
                     type="button"
@@ -693,7 +554,6 @@ return (
                         setShowAddProduct(true);
                         setShowAddCategory(false);
                       }
-
                       setError("");
                       setSuccessMessage("");
                     }}
@@ -702,7 +562,6 @@ return (
                     {showAddProduct ? "Cancel" : "+ Add Product"}
                   </button>
                 )}
-
                 {activeTab === "Categories" && (
                   <button
                     type="button"
@@ -716,7 +575,6 @@ return (
                         setShowAddCategory(true);
                         setShowAddProduct(false);
                       }
-
                       setError("");
                       setSuccessMessage("");
                     }}
@@ -726,7 +584,6 @@ return (
                   </button>
                 )}
               </div>
-
               <p className="mt-2 text-sm text-[#806f63]">
                 {activeTab === "Overview"
                   ? "Here is an overview of your store."
@@ -735,73 +592,53 @@ return (
             </div>
 
             {successMessage && (
-              <p
-                role="status"
-                className="mb-5 rounded-xl bg-green-50 p-4 text-sm text-green-700"
-              >
+              <p role="status" className="mb-5 rounded-xl bg-green-50 p-4 text-sm text-green-700">
                 {successMessage}
               </p>
             )}
 
             {error && (
-              <p
-                role="alert"
-                className="mb-5 rounded-xl bg-red-50 p-4 text-sm text-red-700"
-              >
+              <p role="alert" className="mb-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">
                 {error}
               </p>
             )}
 
-            {/* Overview */}
             {activeTab === "Overview" && (
               <div className="rounded-xl bg-[#faf7f2] p-6">
                 <h3 className="text-lg font-semibold">Welcome back!</h3>
                 <p className="mt-2 text-sm leading-6 text-[#806f63]">
-                  Your dashboard statistics come from the EscuelaJS API,
-                  except orders, which are currently saved in this browser.
+                  Your dashboard statistics come from the EscuelaJS API, except orders, which are currently saved in this browser.
                 </p>
-
                 {loading && (
-                  <p className="mt-4 text-sm text-[#806f63]">
-                    Loading dashboard data...
-                  </p>
+                  <p className="mt-4 text-sm text-[#806f63]">Loading dashboard data...</p>
                 )}
               </div>
             )}
 
-            {/* Products */}
             {activeTab === "Products" && (
               <div>
-              {/* Product search and filters */}
                 <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <input
                     type="search"
                     value={productSearch}
-                    onChange={(event) =>
-                      setProductSearch(event.target.value)
-                    }
+                    onChange={(event) => setProductSearch(event.target.value)}
                     placeholder="Search products..."
                     aria-label="Search products"
                     className={inputStyle}
                   />
-
                   <select
                     value={productCategoryFilter}
-                    onChange={(event) =>
-                      setProductCategoryFilter(event.target.value)
-                    }
+                    onChange={(event) => setProductCategoryFilter(event.target.value)}
                     aria-label="Filter products by category"
                     className={inputStyle}
                   >
                     <option value="all">All categories</option>
-
                     {categories.map((category) => (
                       <option key={category.id} value={String(category.id)}>
                         {category.name}
                       </option>
                     ))}
                   </select>
-
                   <select
                     value={productSort}
                     onChange={(event) => setProductSort(event.target.value)}
@@ -814,6 +651,7 @@ return (
                     <option value="price-high">Price: High to low</option>
                   </select>
                 </div>
+
                 {showAddProduct && (
                   <form
                     onSubmit={handleSaveProduct}
@@ -822,13 +660,9 @@ return (
                     <h3 className="mb-5 text-xl font-bold">
                       {editingProduct ? "Edit Product" : "Add a New Product"}
                     </h3>
-
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                       <div className="sm:col-span-2">
-                        <label
-                          htmlFor="product-title"
-                          className="mb-2 block text-sm font-medium"
-                        >
+                        <label htmlFor="product-title" className="mb-2 block text-sm font-medium">
                           Product Name
                         </label>
                         <input
@@ -840,12 +674,8 @@ return (
                           placeholder="Enter product name"
                         />
                       </div>
-
                       <div>
-                        <label
-                          htmlFor="product-price"
-                          className="mb-2 block text-sm font-medium"
-                        >
+                        <label htmlFor="product-price" className="mb-2 block text-sm font-medium">
                           Price ($)
                         </label>
                         <input
@@ -860,27 +690,18 @@ return (
                           placeholder="49.99"
                         />
                       </div>
-
                       <div>
-                        <label
-                          htmlFor="product-category"
-                          className="mb-2 block text-sm font-medium"
-                        >
+                        <label htmlFor="product-category" className="mb-2 block text-sm font-medium">
                           Category
                         </label>
                         <select
                           id="product-category"
                           value={categoryId}
-                          onChange={(event) =>
-                            setCategoryId(event.target.value)
-                          }
+                          onChange={(event) => setCategoryId(event.target.value)}
                           required
                           className={inputStyle}
                         >
-                          {categories.length === 0 && (
-                            <option value="1">Category ID 1</option>
-                          )}
-
+                          {categories.length === 0 && <option value="1">Category ID 1</option>}
                           {categories.map((category) => (
                             <option key={category.id} value={category.id}>
                               {category.name}
@@ -888,12 +709,8 @@ return (
                           ))}
                         </select>
                       </div>
-
                       <div className="sm:col-span-2">
-                        <label
-                          htmlFor="product-image"
-                          className="mb-2 block text-sm font-medium"
-                        >
+                        <label htmlFor="product-image" className="mb-2 block text-sm font-medium">
                           Product Image URL
                         </label>
                         <input
@@ -905,42 +722,27 @@ return (
                           className={inputStyle}
                           placeholder="https://example.com/image.jpg"
                         />
-
                         {imageUrl && (
                           <div className="mt-3">
-                            <p className="mb-2 text-xs text-[#806f63]">
-                              Image preview
-                            </p>
+                            <p className="mb-2 text-xs text-[#806f63]">Image preview</p>
                             <img
                               src={imageUrl}
                               alt="Product preview"
                               className="h-28 w-28 rounded-xl border border-[#eadfce] bg-white object-contain p-2"
-                              onError={(event) => {
-                                event.currentTarget.style.visibility =
-                                  "hidden";
-                              }}
-                              onLoad={(event) => {
-                                event.currentTarget.style.visibility =
-                                  "visible";
-                              }}
+                              onError={(event) => { event.currentTarget.style.visibility = "hidden"; }}
+                              onLoad={(event) => { event.currentTarget.style.visibility = "visible"; }}
                             />
                           </div>
                         )}
                       </div>
-
                       <div className="sm:col-span-2">
-                        <label
-                          htmlFor="product-description"
-                          className="mb-2 block text-sm font-medium"
-                        >
+                        <label htmlFor="product-description" className="mb-2 block text-sm font-medium">
                           Description
                         </label>
                         <textarea
                           id="product-description"
                           value={description}
-                          onChange={(event) =>
-                            setDescription(event.target.value)
-                          }
+                          onChange={(event) => setDescription(event.target.value)}
                           required
                           rows={4}
                           className={`${inputStyle} resize-y`}
@@ -948,20 +750,14 @@ return (
                         />
                       </div>
                     </div>
-
                     <div className="mt-6 flex flex-wrap gap-3">
                       <button
                         type="submit"
                         disabled={saving}
                         className="rounded-lg bg-[#402b20] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#604333] disabled:opacity-60"
                       >
-                        {saving
-                          ? "Saving..."
-                          : editingProduct
-                            ? "Save Changes"
-                            : "Save Product"}
+                        {saving ? "Saving..." : editingProduct ? "Save Changes" : "Save Product"}
                       </button>
-
                       <button
                         type="button"
                         onClick={resetProductForm}
@@ -974,13 +770,9 @@ return (
                 )}
 
                 {loading ? (
-                  <p className="py-8 text-center text-[#806f63]">
-                    Loading products...
-                  </p>
-                ) : products.length === 0 ? (
-                  <p className="py-8 text-center text-[#806f63]">
-                    No products found.
-                  </p>
+                  <p className="py-8 text-center text-[#806f63]">Loading products...</p>
+                ) : filteredProducts.length === 0 ? (
+                  <p className="py-8 text-center text-[#806f63]">No products found.</p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full min-w-[680px] text-left text-sm">
@@ -993,11 +785,8 @@ return (
                         </tr>
                       </thead>
                       <tbody>
-                        {products.map((product) => (
-                          <tr
-                            key={product.id}
-                            className="border-b border-[#f0e8dc] last:border-0"
-                          >
+                        {filteredProducts.map((product) => (
+                          <tr key={product.id} className="border-b border-[#f0e8dc] last:border-0">
                             <td className="px-3 py-4">
                               <div className="flex items-center gap-3">
                                 <img
@@ -1010,15 +799,12 @@ return (
                                 </span>
                               </div>
                             </td>
-
                             <td className="px-3 py-4 text-[#806f63]">
                               {product.category?.name || "Uncategorized"}
                             </td>
-
                             <td className="px-3 py-4 font-semibold">
                               ${Number(product.price).toFixed(2)}
                             </td>
-
                             <td className="px-3 py-4">
                               <div className="flex gap-2">
                                 <button
@@ -1028,13 +814,10 @@ return (
                                 >
                                   Edit
                                 </button>
-
                                 <button
                                   type="button"
                                   disabled={saving}
-                                  onClick={() =>
-                                    void handleDeleteProduct(product)
-                                  }
+                                  onClick={() => void handleDeleteProduct(product)}
                                   className="rounded-lg border border-red-200 px-3 py-2 text-xs text-red-700 hover:bg-red-50 disabled:opacity-50"
                                 >
                                   Delete
@@ -1050,7 +833,6 @@ return (
               </div>
             )}
 
-            {/* Categories */}
             {activeTab === "Categories" && (
               <div>
                 {showAddCategory && (
@@ -1061,75 +843,52 @@ return (
                     <h3 className="mb-5 text-lg font-bold">
                       {editingCategory ? "Edit Category" : "Add a New Category"}
                     </h3>
-
                     <div className="space-y-4">
                       <div>
-                        <label
-                          htmlFor="category-name"
-                          className="mb-2 block text-sm font-medium"
-                        >
+                        <label htmlFor="category-name" className="mb-2 block text-sm font-medium">
                           Category Name
                         </label>
                         <input
                           id="category-name"
                           value={categoryName}
-                          onChange={(event) =>
-                            setCategoryName(event.target.value)
-                          }
+                          onChange={(event) => setCategoryName(event.target.value)}
                           required
                           className={inputStyle}
                           placeholder="e.g. Handbags"
                         />
                       </div>
-
                       <div>
-                        <label
-                          htmlFor="category-image"
-                          className="mb-2 block text-sm font-medium"
-                        >
+                        <label htmlFor="category-image" className="mb-2 block text-sm font-medium">
                           Category Image URL
                         </label>
                         <input
                           id="category-image"
                           type="url"
                           value={categoryImage}
-                          onChange={(event) =>
-                            setCategoryImage(event.target.value)
-                          }
+                          onChange={(event) => setCategoryImage(event.target.value)}
                           required
                           className={inputStyle}
                           placeholder="https://example.com/category.jpg"
                         />
-
                         {categoryImage && (
                           <img
                             src={categoryImage}
                             alt="Category preview"
                             className="mt-3 h-24 w-24 rounded-xl border border-[#eadfce] bg-white object-cover"
-                            onError={(event) => {
-                              event.currentTarget.style.visibility = "hidden";
-                            }}
-                            onLoad={(event) => {
-                              event.currentTarget.style.visibility = "visible";
-                            }}
+                            onError={(event) => { event.currentTarget.style.visibility = "hidden"; }}
+                            onLoad={(event) => { event.currentTarget.style.visibility = "visible"; }}
                           />
                         )}
                       </div>
                     </div>
-
                     <div className="mt-5 flex flex-wrap gap-3">
                       <button
                         type="submit"
                         disabled={saving}
                         className="rounded-lg bg-[#402b20] px-5 py-3 text-sm font-medium text-white disabled:opacity-60"
                       >
-                        {saving
-                          ? "Saving..."
-                          : editingCategory
-                            ? "Save Changes"
-                            : "Save Category"}
+                        {saving ? "Saving..." : editingCategory ? "Save Changes" : "Save Category"}
                       </button>
-
                       <button
                         type="button"
                         onClick={resetCategoryForm}
@@ -1142,13 +901,9 @@ return (
                 )}
 
                 {loading ? (
-                  <p className="py-8 text-center text-[#806f63]">
-                    Loading categories...
-                  </p>
+                  <p className="py-8 text-center text-[#806f63]">Loading categories...</p>
                 ) : categories.length === 0 ? (
-                  <p className="py-8 text-center text-[#806f63]">
-                    No categories found.
-                  </p>
+                  <p className="py-8 text-center text-[#806f63]">No categories found.</p>
                 ) : (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {categories.map((category) => (
@@ -1160,21 +915,13 @@ return (
                           src={category.image}
                           alt={category.name}
                           className="h-16 w-16 rounded-lg bg-[#faf7f2] object-cover"
-                          onError={(event) => {
-                            event.currentTarget.style.visibility = "hidden";
-                          }}
-                          onLoad={(event) => {
-                            event.currentTarget.style.visibility = "visible";
-                          }}
+                          onError={(event) => { event.currentTarget.style.visibility = "hidden"; }}
+                          onLoad={(event) => { event.currentTarget.style.visibility = "visible"; }}
                         />
-
                         <div className="min-w-0 flex-1">
                           <h3 className="font-semibold">{category.name}</h3>
-                          <p className="mt-1 text-xs text-[#806f63]">
-                            Category ID: {category.id}
-                          </p>
+                          <p className="mt-1 text-xs text-[#806f63]">Category ID: {category.id}</p>
                         </div>
-
                         <div className="flex flex-col gap-2">
                           <button
                             type="button"
@@ -1183,13 +930,10 @@ return (
                           >
                             Edit
                           </button>
-
                           <button
                             type="button"
                             disabled={saving}
-                            onClick={() =>
-                              void handleDeleteCategory(category)
-                            }
+                            onClick={() => void handleDeleteCategory(category)}
                             className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
                           >
                             Delete
@@ -1202,21 +946,15 @@ return (
               </div>
             )}
 
-            {/* Users */}
             {activeTab === "Users" && (
               <div>
                 <p className="mb-5 rounded-xl bg-[#faf7f2] p-4 text-sm leading-6 text-[#806f63]">
                   View and manage your store&apos;s registered users.
                 </p>
-
                 {loading ? (
-                  <p className="py-8 text-center text-[#806f63]">
-                    Loading users...
-                  </p>
+                  <p className="py-8 text-center text-[#806f63]">Loading users...</p>
                 ) : uniqueUsers.length === 0 ? (
-                  <p className="py-8 text-center text-[#806f63]">
-                    No users found.
-                  </p>
+                  <p className="py-8 text-center text-[#806f63]">No users found.</p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full min-w-[520px] text-left text-sm">
@@ -1229,10 +967,7 @@ return (
                       </thead>
                       <tbody>
                         {uniqueUsers.map((user) => (
-                          <tr
-                            key={user.id}
-                            className="border-b border-[#f0e8dc] last:border-0"
-                          >
+                          <tr key={user.id} className="border-b border-[#f0e8dc] last:border-0">
                             <td className="px-3 py-4">
                               <div className="flex items-center gap-3">
                                 <img
@@ -1243,11 +978,7 @@ return (
                                 <span className="font-medium">{user.name}</span>
                               </div>
                             </td>
-
-                            <td className="px-3 py-4 text-[#806f63]">
-                              {user.email}
-                            </td>
-
+                            <td className="px-3 py-4 text-[#806f63]">{user.email}</td>
                             <td className="px-3 py-4">
                               <span className="rounded-full bg-[#f0e5d4] px-3 py-1 text-xs font-medium">
                                 {user.role}
@@ -1262,15 +993,12 @@ return (
               </div>
             )}
 
-            {/* Orders */}
             {activeTab === "Orders" && (
               <div>
                 <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                   <p className="rounded-xl bg-[#faf7f2] p-4 text-sm leading-6 text-[#806f63]">
-                    Orders saved in this browser. These are simulated orders,
-                    not real payments.
+                    Orders saved in this browser. These are simulated orders, not real payments.
                   </p>
-
                   <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
@@ -1280,7 +1008,6 @@ return (
                     >
                       🗑️ Clear Delivered Orders
                     </button>
-
                     <button
                       type="button"
                       onClick={loadOrders}
@@ -1296,39 +1023,27 @@ return (
                     <span className="text-4xl">📦</span>
                     <h3 className="mt-3 font-semibold">No orders found</h3>
                     <p className="mt-2 text-sm text-[#806f63]">
-                      Place a test order from checkout in this browser to see
-                      it here.
+                      Place a test order from checkout in this browser to see it here.
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-5">
                     {orders.map((order) => (
-                      <article
-                        key={order.orderNumber}
-                        className="rounded-xl border border-[#eadfce] p-5"
-                      >
+                      <article key={order.orderNumber} className="rounded-xl border border-[#eadfce] p-5">
                         <div className="flex flex-wrap items-start justify-between gap-4">
                           <div>
-                            <h3 className="font-bold">
-                              Order {order.orderNumber}
-                            </h3>
+                            <h3 className="font-bold">Order {order.orderNumber}</h3>
                             <p className="mt-1 text-sm text-[#806f63]">
                               {new Date(order.createdAt).toLocaleString()}
                             </p>
                           </div>
-
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="rounded-full bg-[#f0e5d4] px-3 py-1 text-xs font-medium">
                               Demo order
                             </span>
-
-                            <label
-                              className="sr-only"
-                              htmlFor={`status-${order.orderNumber}`}
-                            >
+                            <label className="sr-only" htmlFor={`status-${order.orderNumber}`}>
                               Order status
                             </label>
-
                             <select
                               id={`status-${order.orderNumber}`}
                               value={order.status}
@@ -1350,29 +1065,16 @@ return (
 
                         <div className="mt-5 border-t border-[#eadfce] pt-5">
                           <h4 className="font-semibold">Customer details</h4>
-
                           <p className="mt-2 text-sm">
-                            {order.customer.fullName ||
-                              order.customer.name ||
-                              "Customer"}
+                            {order.customer.fullName || order.customer.name || "Customer"}
                           </p>
-
-                          <p className="mt-1 text-sm text-[#806f63]">
-                            {order.customer.email}
-                          </p>
-
+                          <p className="mt-1 text-sm text-[#806f63]">{order.customer.email}</p>
                           {order.customer.phone && (
-                            <p className="mt-1 text-sm text-[#806f63]">
-                              {order.customer.phone}
-                            </p>
+                            <p className="mt-1 text-sm text-[#806f63]">{order.customer.phone}</p>
                           )}
-
                           {(order.customer.address || order.customer.city) && (
                             <p className="mt-1 text-sm text-[#806f63]">
-                              {[
-                                order.customer.address,
-                                order.customer.city,
-                              ]
+                              {[order.customer.address, order.customer.city]
                                 .filter(Boolean)
                                 .join(", ")}
                             </p>
@@ -1381,29 +1083,19 @@ return (
 
                         <div className="mt-5 border-t border-[#eadfce] pt-5">
                           <h4 className="font-semibold">Order items</h4>
-
                           <div className="mt-3 space-y-3">
                             {order.items.map((item, index) => (
-                              <div
-                                key={`${item.id}-${index}`}
-                                className="flex justify-between gap-4 text-sm"
-                              >
-                                <span>
-                                  {item.title} × {item.quantity}
-                                </span>
-
+                              <div key={`${item.id}-${index}`} className="flex justify-between gap-4 text-sm">
+                                <span>{item.title} × {item.quantity}</span>
                                 <span className="font-medium">
                                   ${(item.price * item.quantity).toFixed(2)}
                                 </span>
                               </div>
                             ))}
                           </div>
-
                           <div className="mt-5 flex justify-between border-t border-[#eadfce] pt-4 font-bold">
                             <span>Total</span>
-                            <span>
-                              ${Number(order.total).toFixed(2)}
-                            </span>
+                            <span>${Number(order.total).toFixed(2)}</span>
                           </div>
                         </div>
                       </article>
