@@ -8,10 +8,11 @@ import {
   type ReactNode,
 } from "react";
 
-type User = {
+export type User = {
   id: number;
   name: string;
   email: string;
+  role: string;
   avatar?: string;
 };
 
@@ -42,6 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    setLoading(true);
+
     try {
       const response = await fetch(`${API_URL}/auth/profile`, {
         headers: {
@@ -64,10 +67,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser({
         ...profile,
         name: savedName || profile.name,
-        avatar: savedAvatar || undefined,
+        avatar: savedAvatar || profile.avatar || undefined,
       });
-    } catch {
-      // Don't treat a network failure as a successful login.
+    } catch (error) {
+      console.error("Failed to load authenticated profile:", error);
       setUser(null);
     } finally {
       setLoading(false);
@@ -85,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser({
       ...newUser,
       name: savedName || newUser.name,
-      avatar: savedAvatar || undefined,
+      avatar: savedAvatar || newUser.avatar || undefined,
     });
 
     setLoading(false);

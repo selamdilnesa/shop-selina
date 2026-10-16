@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import {
   getProducts,
   createProduct,
@@ -34,13 +35,15 @@ type ManagedOrder = DemoOrder & {
 };
 
 const ORDER_STATUS_KEY = "shop-selina-order-statuses";
+const ORDERS_STORAGE_KEY = "shop-selina-orders";
 
 const inputStyle =
   "w-full rounded-lg border border-[#eadfce] bg-white px-4 py-3 text-sm text-[#402b20] outline-none focus:border-[#a78655]";
 
 export default function AdminPage() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("Overview");
-
   const [products, setProducts] = useState<Product[]>([]);
   const [productSearch, setProductSearch] = useState("");
   const [productCategoryFilter, setProductCategoryFilter] = useState("all");
@@ -136,6 +139,68 @@ export default function AdminPage() {
     }
   }
 
+  // Remove all orders currently marked as Delivered.
+  function handleClearDeliveredOrders() {
+    const deliveredOrders = orders.filter(
+      (order) => order.status === "Delivered"
+    );
+
+    if (deliveredOrders.length === 0) {
+      setError("");
+      setSuccessMessage("There are no delivered orders to clear.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to remove all ${deliveredOrders.length} delivered order(s)? Pending, Processing, and Shipped orders will remain.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const deliveredOrderNumbers = new Set(
+        deliveredOrders.map((order) => order.orderNumber)
+      );
+
+      const savedOrders = getOrders();
+      const remainingSavedOrders = savedOrders.filter(
+        (order) => !deliveredOrderNumbers.has(order.orderNumber)
+      );
+
+      // Update the original order list in localStorage.
+      localStorage.setItem(
+        ORDERS_STORAGE_KEY,
+        JSON.stringify(remainingSavedOrders)
+      );
+
+      // Remove status entries for the deleted orders only.
+      const storedStatuses = localStorage.getItem(ORDER_STATUS_KEY);
+      const savedStatuses = storedStatuses
+        ? (JSON.parse(storedStatuses) as Record<string, OrderStatus>)
+        : {};
+
+      deliveredOrderNumbers.forEach((orderNumber) => {
+        delete savedStatuses[orderNumber];
+      });
+
+      localStorage.setItem(
+        ORDER_STATUS_KEY,
+        JSON.stringify(savedStatuses)
+      );
+
+      setOrders((currentOrders) =>
+        currentOrders.filter((order) => order.status !== "Delivered")
+      );
+      setError("");
+      setSuccessMessage(
+        `${deliveredOrders.length} delivered order(s) cleared successfully.`
+      );
+    } catch {
+      setError("Unable to clear delivered orders. Please try again.");
+      setSuccessMessage("");
+    }
+  }
+
   // Load dashboard data.
   async function loadDashboard() {
     setLoading(true);
@@ -172,19 +237,32 @@ export default function AdminPage() {
     }
   }
 
-  useEffect(() => {
-    void loadDashboard();
+ 
+useEffect(() => {
+  if (authLoading) return;
 
-    function handleStorageChange() {
-      loadOrders();
-    }
+  if (!user) {
+    router.replace("/login");
+    return;
+  }
 
-    window.addEventListener("storage", handleStorageChange);
+  if (user.role !== "admin") {
+    router.replace("/");
+    return;
+  }
 
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+  void loadDashboard();
+
+  function handleStorageChange() {
+    loadOrders();
+  }
+
+  window.addEventListener("storage", handleStorageChange);
+
+  return () => {
+    window.removeEventListener("storage", handleStorageChange);
+  };
+}, [authLoading, user, router]);
 
   // Reset the product form.
   function resetProductForm() {
@@ -485,9 +563,21 @@ export default function AdminPage() {
     { title: "Total Users", value: uniqueUsers.length, icon: "👥" },
     { title: "Total Orders", value: orders.length, icon: "📦" },
   ];
-
+if (authLoading) {
   return (
-    <main className="min-h-screen bg-[#faf7f2] p-4 text-[#402b20] sm:p-8">
+    <main className="flex min-h-screen items-center justify-center bg-[#faf7f2] text-[#402b20]">
+      <p className="text-sm">Checking your access...</p>
+    </main>
+  );
+}
+
+if (!user || user.role !== "admin") {
+  return null;
+}
+
+return (
+  <main className="min-h-screen bg-[#faf7f2] p-4 text-[#402b20] sm:p-8">
+    
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -1181,13 +1271,24 @@ export default function AdminPage() {
                     not real payments.
                   </p>
 
-                  <button
-                    type="button"
-                    onClick={loadOrders}
-                    className="shrink-0 rounded-lg border border-[#eadfce] px-4 py-2 text-sm hover:bg-[#faf7f2]"
-                  >
-                    ↻ Refresh Orders
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={handleClearDeliveredOrders}
+                      disabled={!orders.some((order) => order.status === "Delivered")}
+                      className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      🗑️ Clear Delivered Orders
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={loadOrders}
+                      className="shrink-0 rounded-lg border border-[#eadfce] px-4 py-2 text-sm hover:bg-[#faf7f2]"
+                    >
+                      ↻ Refresh Orders
+                    </button>
+                  </div>
                 </div>
 
                 {orders.length === 0 ? (
