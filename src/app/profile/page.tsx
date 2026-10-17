@@ -22,7 +22,6 @@ export default function ProfilePage() {
     }
   }, [loading, user, router]);
 
-  // Change profile picture
   function handlePhotoChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
@@ -66,20 +65,17 @@ export default function ProfilePage() {
     event.target.value = "";
   }
 
-  // Remove profile picture
   function handleRemovePhoto() {
     updateAvatar("");
     setPhotoError("");
   }
 
-  // Start editing the name
   function handleEditName() {
     setEditedName(user?.name || "");
     setNameError("");
     setIsEditing(true);
   }
 
-  // Save the new name
   function handleSaveName() {
     const trimmedName = editedName.trim();
 
@@ -103,14 +99,12 @@ export default function ProfilePage() {
     setNameError("");
   }
 
-  // Cancel editing
   function handleCancelEdit() {
     setEditedName(user?.name || "");
     setNameError("");
     setIsEditing(false);
   }
 
-  // Log out
   function handleLogout() {
     logout();
     router.replace("/login");
@@ -118,8 +112,30 @@ export default function ProfilePage() {
 
   if (loading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#faf7f2]">
-        <p className="text-[#402b20]">Loading your account...</p>
+      <main className="flex min-h-[70vh] items-center justify-center bg-[#faf7f2] px-5">
+        <div className="flex flex-col items-center text-center">
+          <div className="relative flex h-20 w-20 items-center justify-center">
+            <div className="absolute inset-0 animate-spin rounded-full border-2 border-[#eadfce] border-t-[#a78655]" />
+
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#faf7f2]">
+              <img
+                src="/logo.webp"
+                alt="Shop Selina logo"
+                className="h-12 w-12 object-contain"
+              />
+            </div>
+          </div>
+
+          <h2 className="mt-5 font-serif text-2xl font-semibold text-[#402b20]">
+            Your Account
+          </h2>
+
+          <p className="mt-2 text-sm text-[#8b796c]">
+            Just a moment, getting everything ready...
+          </p>
+
+          <div className="mt-5 h-px w-24 bg-[#d4af6a]" />
+        </div>
       </main>
     );
   }
@@ -127,7 +143,6 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-[#faf7f2] px-4 py-16">
       <div className="mx-auto max-w-2xl">
-        {/* Page heading */}
         <div className="mb-10 text-center">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#a78655]">
             My Account
@@ -143,7 +158,6 @@ export default function ProfilePage() {
         </div>
 
         <section className="rounded-2xl border border-[#e8dfd2] bg-white p-8 shadow-sm sm:p-10">
-          {/* Profile picture */}
           <div className="mb-8 flex flex-col items-center">
             <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-2 border-[#d4af6a] bg-[#402b20]">
               {user.avatar ? (
@@ -208,9 +222,7 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          {/* Account information */}
           <div className="space-y-5 border-t border-[#e8dfd2] pt-6">
-            {/* Editable name */}
             <div>
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#a78655]">
@@ -240,6 +252,7 @@ export default function ProfilePage() {
                       if (event.key === "Enter") {
                         handleSaveName();
                       }
+
                       if (event.key === "Escape") {
                         handleCancelEdit();
                       }
@@ -279,7 +292,6 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Email */}
             <div>
               <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#a78655]">
                 Email Address
@@ -289,7 +301,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Action buttons */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/products"

@@ -60,14 +60,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const profile: User = await response.json();
-
-      const savedAvatar = localStorage.getItem("custom_profile_avatar");
+       
+    const savedAvatar = localStorage.getItem("custom_profile_avatar");
       const savedName = localStorage.getItem("custom_profile_name");
 
       setUser({
         ...profile,
         name: savedName || profile.name,
-        avatar: savedAvatar || profile.avatar || undefined,
+       avatar: savedAvatar || undefined,
       });
     } catch (error) {
       console.error("Failed to load authenticated profile:", error);
@@ -123,14 +123,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function logout() {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("custom_profile_avatar");
-    localStorage.removeItem("custom_profile_name");
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
 
-    setUser(null);
-    setLoading(false);
-  }
+  setUser(null);
+  setLoading(false);
+}
 
   return (
     <AuthContext.Provider

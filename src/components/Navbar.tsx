@@ -79,6 +79,28 @@ function NavIcon({ name }: { name: string }) {
   );
 }
 
+function ProfileAvatar({
+  name,
+  size = "normal",
+}: {
+  name: string;
+  size?: "normal" | "small";
+}) {
+  const initial = name.trim().charAt(0).toUpperCase() || "?";
+  const isSmall = size === "small";
+
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center justify-center rounded-full border border-[#d4af6a] bg-[#faf7f2] font-semibold text-[#402b20] ${
+        isSmall ? "h-8 w-8 text-xs" : "h-9 w-9 text-sm"
+      }`}
+      aria-label={`${name || "User"} profile`}
+    >
+      {initial}
+    </span>
+  );
+}
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -214,7 +236,12 @@ export default function Navbar() {
                   active ? "text-[#a78655]" : "text-[#402b20]"
                 }`}
               >
-                <NavIcon name={link.name} />
+                {link.name === "Profile" && user ? (
+                  <ProfileAvatar name={user.name} />
+                ) : (
+                  <NavIcon name={link.name} />
+                )}
+
                 {link.name}
 
                 {active && (
@@ -323,7 +350,12 @@ export default function Navbar() {
                 }`}
               >
                 <span className="flex items-center gap-3">
-                  <NavIcon name={link.name} />
+                  {link.name === "Profile" && user ? (
+                    <ProfileAvatar name={user.name} size="small" />
+                  ) : (
+                    <NavIcon name={link.name} />
+                  )}
+
                   {link.name}
                 </span>
               </Link>

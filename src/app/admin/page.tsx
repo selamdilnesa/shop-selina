@@ -528,7 +528,25 @@ export default function AdminPage() {
                   }`}
                 >
                   <span>{item.icon}</span>
-                  {item.name}
+
+            <span className="flex-1">{item.name}</span>
+
+            {item.name === "Orders" && (
+              <span
+                className={`flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-xs font-bold ${
+                  orders.length > 0
+                    ? activeTab === "Orders"
+                      ? "bg-[#d4af6a] text-[#402b20]"
+                      : "bg-[#a78655] text-white"
+                    : activeTab === "Orders"
+                      ? "bg-white/15 text-white"
+                      : "bg-[#f0e5d4] text-[#806f63]"
+                }`}
+                aria-label={`${orders.length} total orders`}
+              >
+                {orders.length}
+              </span>
+            )}
                 </button>
               ))}
             </nav>
