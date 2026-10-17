@@ -75,12 +75,7 @@ Here is a visual walkthrough of the application across desktop and mobile screen
 #### 4. Shopping Cart (`/cart`)
 > ![Cart Desktop](./public/assets/shop-selina-assets/desktop/cart/cart-1.png)
 
-#### 5. Authentication & Profile (`/login`, `/register`, `/profile`)
-> ![Login Desktop](./public/assets/shop-selina-assets/desktop/login-and-register/login.png)
-> ![Register Desktop](./public/assets/shop-selina-assets/desktop/login-and-register/register.png)
-> ![Profile Desktop](./public/assets/shop-selina-assets/desktop/profile/profile.png)
-
-#### 6. Admin Dashboard & Management (`/admin`)
+#### 5. Admin Dashboard & Management (`/admin`)
 > ![Admin Desktop 1](./public/assets/shop-selina-assets/desktop/admin-page/admin1.png)
 > ![Admin Desktop 2](./public/assets/shop-selina-assets/desktop/admin-page/admin2.png)
 
