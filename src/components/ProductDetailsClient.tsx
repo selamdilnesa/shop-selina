@@ -33,7 +33,7 @@ export default function ProductDetailsClient({
   // Product image display
   if (!product) {
     return (
-      <div className="flex min-h-[350px] items-center justify-center overflow-hidden border border-[#e8dfd2] bg-white p-8 sm:min-h-[500px] sm:p-12">
+      <div className="flex min-h-[350px] items-center justify-center overflow-hidden border border-[#e8dfd2] bg-white p-8 transition-colors dark:border-[#49372b] dark:bg-[#30231d] sm:min-h-[500px] sm:p-12">
         {validImage && !imageFailed ? (
           <img
             src={validImage}
@@ -44,7 +44,7 @@ export default function ProductDetailsClient({
         ) : (
           <div className="text-center">
             <span className="text-5xl">🛍️</span>
-            <p className="mt-4 text-sm text-[#806b5b]">
+            <p className="mt-4 text-sm text-[#806b5b] dark:text-[#c4b4a7]">
               Product image unavailable
             </p>
           </div>
@@ -60,7 +60,7 @@ export default function ProductDetailsClient({
     product.price < 0
   ) {
     return (
-      <p className="mt-6 text-sm text-[#806b5b]">
+      <p className="mt-6 text-sm text-[#806b5b] dark:text-[#c4b4a7]">
         The price of this product is currently unavailable.
       </p>
     );
@@ -72,12 +72,12 @@ export default function ProductDetailsClient({
       <div>
         <label
           htmlFor="product-quantity"
-          className="mb-3 block text-sm font-medium text-[#402b20]"
+          className="mb-3 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
         >
           Quantity
         </label>
 
-        <div className="flex w-fit items-center border border-[#d8c8b5] bg-white">
+        <div className="flex w-fit items-center border border-[#d8c8b5] bg-white transition-colors dark:border-[#49372b] dark:bg-[#281d18]">
           <button
             type="button"
             onClick={() =>
@@ -85,7 +85,7 @@ export default function ProductDetailsClient({
             }
             disabled={quantity <= 1}
             aria-label="Decrease quantity"
-            className="h-11 w-11 text-lg text-[#402b20] transition hover:bg-[#f3ece2] disabled:cursor-not-allowed disabled:opacity-40"
+            className="h-11 w-11 text-lg text-[#402b20] transition hover:bg-[#f3ece2] disabled:cursor-not-allowed disabled:opacity-40 dark:text-[#faf7f2] dark:hover:bg-[#382a22]"
           >
             −
           </button>
@@ -110,7 +110,7 @@ export default function ProductDetailsClient({
                   : 1
               );
             }}
-            className="h-11 w-14 border-x border-[#e8dfd2] bg-white text-center text-sm text-[#402b20] outline-none"
+            className="h-11 w-14 border-x border-[#e8dfd2] bg-white text-center text-sm text-[#402b20] outline-none transition-colors dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2]"
           />
 
           <button
@@ -119,7 +119,7 @@ export default function ProductDetailsClient({
               setQuantity((current) => current + 1)
             }
             aria-label="Increase quantity"
-            className="h-11 w-11 text-lg text-[#402b20] transition hover:bg-[#f3ece2]"
+            className="h-11 w-11 text-lg text-[#402b20] transition hover:bg-[#f3ece2] dark:text-[#faf7f2] dark:hover:bg-[#382a22]"
           >
             +
           </button>
@@ -137,7 +137,7 @@ export default function ProductDetailsClient({
         quantity={quantity}
       />
 
-      <p className="text-xs text-[#806b5b]">
+      <p className="text-xs text-[#806b5b] dark:text-[#c4b4a7]">
         Carefully selected for you · Shop Selina
       </p>
     </div>

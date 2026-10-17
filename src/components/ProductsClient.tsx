@@ -103,23 +103,23 @@ export default function ProductsClient({
   return (
     <>
       {/* Search and Filter Section */}
-      <section className="mb-8 mt-8 rounded-2xl border border-[#e8dfd2] bg-white p-4 sm:mb-10 sm:mt-10 sm:p-7">
+      <section className="mb-8 mt-8 rounded-2xl border border-[#e8dfd2] bg-white p-4 transition-colors dark:border-[#49372b] dark:bg-[#30231d] sm:mb-10 sm:mt-10 sm:p-7">
         <div className="mb-5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#a78655] sm:text-xs">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#a78655] dark:text-[#c6a16b] sm:text-xs">
             Find your favorites
           </p>
 
           <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
-            <h2 className="font-serif text-xl text-[#402b20] sm:text-2xl">
+            <h2 className="font-serif text-xl text-[#402b20] dark:text-[#faf7f2] sm:text-2xl">
               Refine Your Search
             </h2>
 
             <p
-              className="text-xs text-[#8b796c] sm:text-sm"
+              className="text-xs text-[#8b796c] dark:text-[#c4b4a7] sm:text-sm"
               aria-live="polite"
             >
               Showing{" "}
-              <span className="font-semibold text-[#402b20]">
+              <span className="font-semibold text-[#402b20] dark:text-[#c6a16b]">
                 {filteredProducts.length}
               </span>{" "}
               of {products.length} products
@@ -133,9 +133,9 @@ export default function ProductsClient({
             Search products
           </label>
 
-          <div className="flex items-center gap-3 rounded-xl border border-[#e8dfd2] bg-[#faf7f2] px-3 transition focus-within:border-[#b18a50] focus-within:ring-2 focus-within:ring-[#b18a50]/10 sm:px-4">
+          <div className="flex items-center gap-3 rounded-xl border border-[#e8dfd2] bg-[#faf7f2] px-3 transition focus-within:border-[#b18a50] focus-within:ring-2 focus-within:ring-[#b18a50]/10 dark:border-[#49372b] dark:bg-[#281d18] dark:focus-within:border-[#c6a16b] sm:px-4">
             <svg
-              className="h-5 w-5 shrink-0 text-[#a78655]"
+              className="h-5 w-5 shrink-0 text-[#a78655] dark:text-[#c6a16b]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -152,14 +152,14 @@ export default function ProductsClient({
               value={searchTitle}
               onChange={(event) => setSearchTitle(event.target.value)}
               placeholder="Search products..."
-              className="min-w-0 flex-1 bg-transparent py-3.5 text-base text-[#402b20] outline-none placeholder:text-[#b2a396] sm:text-sm"
+              className="min-w-0 flex-1 bg-transparent py-3.5 text-base text-[#402b20] outline-none placeholder:text-[#b2a396] dark:text-[#faf7f2] dark:placeholder-[#c4b4a7]/60 sm:text-sm"
             />
 
             {searchTitle && (
               <button
                 type="button"
                 onClick={() => setSearchTitle("")}
-                className="shrink-0 py-2 text-xs font-medium text-[#a78655] hover:text-[#402b20]"
+                className="shrink-0 py-2 text-xs font-medium text-[#a78655] hover:text-[#402b20] dark:text-[#c6a16b] dark:hover:text-[#faf7f2]"
               >
                 Clear
               </button>
@@ -172,7 +172,7 @@ export default function ProductsClient({
           <div>
             <label
               htmlFor="category-filter-mobile"
-              className="mb-1.5 block text-xs font-medium text-[#76533c]"
+              className="mb-1.5 block text-xs font-medium text-[#76533c] dark:text-[#c6a16b]"
             >
               Category
             </label>
@@ -183,7 +183,7 @@ export default function ProductsClient({
               onChange={(event) =>
                 setSelectedCategory(event.target.value)
               }
-              className="w-full min-w-0 rounded-xl border border-[#e8dfd2] bg-white px-2.5 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50]"
+              className="w-full min-w-0 rounded-xl border border-[#e8dfd2] bg-white px-2.5 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50] dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:focus:border-[#c6a16b]"
             >
               <option value="all">All categories</option>
 
@@ -198,7 +198,7 @@ export default function ProductsClient({
           <div>
             <label
               htmlFor="sort-price-mobile"
-              className="mb-1.5 block text-xs font-medium text-[#76533c]"
+              className="mb-1.5 block text-xs font-medium text-[#76533c] dark:text-[#c6a16b]"
             >
               Sort by
             </label>
@@ -207,7 +207,7 @@ export default function ProductsClient({
               id="sort-price-mobile"
               value={sortOrder}
               onChange={(event) => setSortOrder(event.target.value)}
-              className="w-full min-w-0 rounded-xl border border-[#e8dfd2] bg-white px-2.5 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50]"
+              className="w-full min-w-0 rounded-xl border border-[#e8dfd2] bg-white px-2.5 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50] dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:focus:border-[#c6a16b]"
             >
               <option value="default">Featured</option>
               <option value="low-high">Price: Low–High</option>
@@ -221,15 +221,15 @@ export default function ProductsClient({
             aria-expanded={showPriceFilter}
             className={`col-span-2 flex min-h-11 items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition ${
               priceFilterActive
-                ? "border-[#b18a50] bg-[#faf7f2] text-[#402b20]"
-                : "border-[#e8dfd2] bg-white text-[#402b20] hover:bg-[#faf7f2]"
+                ? "border-[#b18a50] bg-[#faf7f2] text-[#402b20] dark:border-[#c6a16b] dark:bg-[#281d18] dark:text-[#faf7f2]"
+                : "border-[#e8dfd2] bg-white text-[#402b20] hover:bg-[#faf7f2] dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:hover:bg-[#382a22]"
             }`}
           >
             <span className="flex items-center gap-2">
               Price filter
 
               {priceFilterActive && (
-                <span className="rounded-full bg-[#402b20] px-2 py-0.5 text-[10px] text-white">
+                <span className="rounded-full bg-[#402b20] px-2 py-0.5 text-[10px] text-white dark:bg-[#c6a16b] dark:text-[#1c1613]">
                   Active
                 </span>
               )}
@@ -250,11 +250,11 @@ export default function ProductsClient({
           </button>
 
           {showPriceFilter && (
-            <div className="col-span-2 grid grid-cols-2 gap-3 rounded-xl bg-[#faf7f2] p-3">
+            <div className="col-span-2 grid grid-cols-2 gap-3 rounded-xl bg-[#faf7f2] p-3 dark:bg-[#281d18]">
               <div>
                 <label
                   htmlFor="min-price-mobile"
-                  className="mb-1.5 block text-xs font-medium text-[#76533c]"
+                  className="mb-1.5 block text-xs font-medium text-[#76533c] dark:text-[#c6a16b]"
                 >
                   Min price ($)
                 </label>
@@ -267,14 +267,14 @@ export default function ProductsClient({
                   value={minPrice}
                   onChange={(event) => setMinPrice(event.target.value)}
                   placeholder="No minimum"
-                  className="w-full min-w-0 rounded-lg border border-[#e8dfd2] bg-white px-3 py-3 text-base text-[#402b20] outline-none focus:border-[#b18a50]"
+                  className="w-full min-w-0 rounded-lg border border-[#e8dfd2] bg-white px-3 py-3 text-base text-[#402b20] outline-none focus:border-[#b18a50] dark:border-[#49372b] dark:bg-[#30231d] dark:text-[#faf7f2] dark:placeholder-[#c4b4a7]/60 dark:focus:border-[#c6a16b]"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="max-price-mobile"
-                  className="mb-1.5 block text-xs font-medium text-[#76533c]"
+                  className="mb-1.5 block text-xs font-medium text-[#76533c] dark:text-[#c6a16b]"
                 >
                   Max price ($)
                 </label>
@@ -287,7 +287,7 @@ export default function ProductsClient({
                   value={maxPrice}
                   onChange={(event) => setMaxPrice(event.target.value)}
                   placeholder="No maximum"
-                  className="w-full min-w-0 rounded-lg border border-[#e8dfd2] bg-white px-3 py-3 text-base text-[#402b20] outline-none focus:border-[#b18a50]"
+                  className="w-full min-w-0 rounded-lg border border-[#e8dfd2] bg-white px-3 py-3 text-base text-[#402b20] outline-none focus:border-[#b18a50] dark:border-[#49372b] dark:bg-[#30231d] dark:text-[#faf7f2] dark:placeholder-[#c4b4a7]/60 dark:focus:border-[#c6a16b]"
                 />
               </div>
             </div>
@@ -296,7 +296,7 @@ export default function ProductsClient({
           <button
             type="button"
             onClick={clearFilters}
-            className="col-span-2 justify-self-start py-2 text-xs font-medium text-[#a78655] underline underline-offset-4 hover:text-[#402b20]"
+            className="col-span-2 justify-self-start py-2 text-xs font-medium text-[#a78655] underline underline-offset-4 hover:text-[#402b20] dark:text-[#c6a16b] dark:hover:text-[#faf7f2]"
           >
             Reset all filters
           </button>
@@ -307,7 +307,7 @@ export default function ProductsClient({
           <div>
             <label
               htmlFor="category-filter-desktop"
-              className="mb-2 block text-sm font-medium text-[#402b20]"
+              className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
             >
               Category
             </label>
@@ -318,7 +318,7 @@ export default function ProductsClient({
               onChange={(event) =>
                 setSelectedCategory(event.target.value)
               }
-              className="w-full rounded-xl border border-[#e8dfd2] bg-[#faf7f2] px-3 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50]"
+              className="w-full rounded-xl border border-[#e8dfd2] bg-[#faf7f2] px-3 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50] dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:focus:border-[#c6a16b]"
             >
               <option value="all">All categories</option>
 
@@ -333,7 +333,7 @@ export default function ProductsClient({
           <div>
             <label
               htmlFor="min-price-desktop"
-              className="mb-2 block text-sm font-medium text-[#402b20]"
+              className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
             >
               Minimum price ($)
             </label>
@@ -346,14 +346,14 @@ export default function ProductsClient({
               value={minPrice}
               onChange={(event) => setMinPrice(event.target.value)}
               placeholder="No minimum"
-              className="w-full rounded-xl border border-[#e8dfd2] bg-[#faf7f2] px-3 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50]"
+              className="w-full rounded-xl border border-[#e8dfd2] bg-[#faf7f2] px-3 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50] dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:placeholder-[#c4b4a7]/60 dark:focus:border-[#c6a16b]"
             />
           </div>
 
           <div>
             <label
               htmlFor="max-price-desktop"
-              className="mb-2 block text-sm font-medium text-[#402b20]"
+              className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
             >
               Maximum price ($)
             </label>
@@ -366,14 +366,14 @@ export default function ProductsClient({
               value={maxPrice}
               onChange={(event) => setMaxPrice(event.target.value)}
               placeholder="No maximum"
-              className="w-full rounded-xl border border-[#e8dfd2] bg-[#faf7f2] px-3 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50]"
+              className="w-full rounded-xl border border-[#e8dfd2] bg-[#faf7f2] px-3 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50] dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:placeholder-[#c4b4a7]/60 dark:focus:border-[#c6a16b]"
             />
           </div>
 
           <div>
             <label
               htmlFor="sort-price-desktop"
-              className="mb-2 block text-sm font-medium text-[#402b20]"
+              className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
             >
               Sort by price
             </label>
@@ -382,7 +382,7 @@ export default function ProductsClient({
               id="sort-price-desktop"
               value={sortOrder}
               onChange={(event) => setSortOrder(event.target.value)}
-              className="w-full rounded-xl border border-[#e8dfd2] bg-[#faf7f2] px-3 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50]"
+              className="w-full rounded-xl border border-[#e8dfd2] bg-[#faf7f2] px-3 py-3 text-sm text-[#402b20] outline-none focus:border-[#b18a50] dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:focus:border-[#c6a16b]"
             >
               <option value="default">Default order</option>
               <option value="low-high">Price: Low to High</option>
@@ -395,7 +395,7 @@ export default function ProductsClient({
           <button
             type="button"
             onClick={clearFilters}
-            className="rounded-full border border-[#402b20] px-5 py-2.5 text-sm font-medium text-[#402b20] transition hover:bg-[#402b20] hover:text-white"
+            className="rounded-full border border-[#402b20] px-5 py-2.5 text-sm font-medium text-[#402b20] transition hover:bg-[#402b20] hover:text-white dark:border-[#c6a16b] dark:text-[#c6a16b] dark:hover:bg-[#c6a16b] dark:hover:text-[#1c1613]"
           >
             Reset Filters
           </button>
@@ -416,9 +416,9 @@ export default function ProductsClient({
             return (
               <article
                 key={product.id}
-                className="group overflow-hidden rounded-2xl border border-[#e8dfd2] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="group overflow-hidden rounded-2xl border border-[#e8dfd2] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-[#49372b] dark:bg-[#30231d]"
               >
-                <div className="relative flex h-64 items-center justify-center bg-[#f4f0e9] p-5">
+                <div className="relative flex h-64 items-center justify-center bg-[#f4f0e9] p-5 dark:bg-[#281d18]">
                   {imageUrl ? (
                     <img
                       src={imageUrl}
@@ -427,12 +427,12 @@ export default function ProductsClient({
                       className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="text-sm text-stone-500">
+                    <div className="text-sm text-stone-500 dark:text-[#c4b4a7]">
                       Image unavailable
                     </div>
                   )}
 
-                  <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#76533c]">
+                  <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#76533c] dark:bg-[#1c1613]/90 dark:text-[#c6a16b]">
                     {product.category?.name || "Collection"}
                   </span>
 
@@ -443,42 +443,47 @@ export default function ProductsClient({
                   <img
                     src="/logo.webp"
                     alt="Shop Selina"
-                    className="absolute bottom-3 right-3 z-10 h-auto w-12 object-contain"
+                    className="absolute bottom-3 right-3 z-10 h-auto w-12 object-contain dark:hidden"
+                  />
+                  <img
+                    src="/darkLogo.jpg"
+                    alt="Shop Selina"
+                    className="absolute bottom-3 right-3 z-10 hidden h-auto w-12 object-contain dark:block"
                   />
                 </div>
 
                 <div className="p-5">
-                  <h2 className="line-clamp-2 min-h-12 font-medium leading-6 text-[#402b20]">
+                  <h2 className="line-clamp-2 min-h-12 font-medium leading-6 text-[#402b20] dark:text-[#faf7f2]">
                     {product.title}
                   </h2>
 
                   {product.rating && (
                     <div className="mt-2 flex items-center gap-1.5 text-sm">
                       <svg
-                        className="h-4 w-4 fill-[#c49a4e] text-[#c49a4e]"
+                        className="h-4 w-4 fill-[#c49a4e] text-[#c49a4e] dark:fill-[#c6a16b] dark:text-[#c6a16b]"
                         viewBox="0 0 24 24"
                         aria-hidden="true"
                       >
                         <path d="m12 2 3.1 6.3 6.9 1-5 4.9-6.2 3.3L7 14.2l-5-4.9 6.9-1L12 2Z" />
                       </svg>
 
-                      <span className="font-semibold text-[#76533c]">
+                      <span className="font-semibold text-[#76533c] dark:text-[#c6a16b]">
                         {product.rating.rate.toFixed(1)}
                       </span>
 
-                      <span className="text-xs text-stone-400">
+                      <span className="text-xs text-stone-400 dark:text-[#c4b4a7]">
                         ({product.rating.count} reviews)
                       </span>
                     </div>
                   )}
 
-                  <p className="mt-3 text-xl font-semibold text-[#402b20]">
+                  <p className="mt-3 text-xl font-semibold text-[#402b20] dark:text-[#faf7f2]">
                     ${product.price.toFixed(2)}
                   </p>
 
                   <Link
                     href={`/products/${product.id}`}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border border-[#402b20] px-4 py-3 text-sm font-medium text-[#402b20] transition hover:bg-[#402b20] hover:text-white"
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border border-[#402b20] px-4 py-3 text-sm font-medium text-[#402b20] transition hover:bg-[#402b20] hover:text-white dark:border-[#c6a16b] dark:text-[#c6a16b] dark:hover:bg-[#c6a16b] dark:hover:text-[#1c1613]"
                   >
                     View Product
 
@@ -501,24 +506,23 @@ export default function ProductsClient({
           })}
         </div>
       ) : (
-        <div className="rounded-2xl border border-[#e8dfd2] bg-white px-6 py-16 text-center">
-          <h2 className="font-serif text-2xl text-[#402b20]">
+        <div className="rounded-2xl border border-[#e8dfd2] bg-white px-6 py-16 text-center transition-colors dark:border-[#49372b] dark:bg-[#30231d]">
+          <h2 className="font-serif text-2xl text-[#402b20] dark:text-[#faf7f2]">
             No products found
           </h2>
 
-          <p className="mt-3 text-sm text-[#8b796c]">
+          <p className="mt-3 text-sm text-[#8b796c] dark:text-[#c4b4a7]">
             Try changing your search or filters.
           </p>
 
           <button
             type="button"
             onClick={clearFilters}
-            className="mt-5 rounded-full bg-[#402b20] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#5b4030]"
+            className="mt-5 rounded-full bg-[#402b20] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#5b4030] dark:bg-[#c6a16b] dark:text-[#1c1613] dark:hover:bg-[#d6b27c]"
           >
             Reset Filters
           </button>
         </div>
       )}
     </>
-  );
-}
+  )}

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+
 html,
 body {
   margin: 0 !important;
@@ -54,72 +55,72 @@ body {
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #faf7f2;
+  --foreground: #402b20;
+  --card: #ffffff;
+  --card-foreground: #402b20;
+  --popover: #ffffff;
+  --popover-foreground: #402b20;
+  --primary: #402b20;
+  --primary-foreground: #faf7f2;
+  --secondary: #f4f0e9;
+  --secondary-foreground: #402b20;
+  --muted: #f0e9df;
+  --muted-foreground: #806c5d;
+  --accent: #f5eddf;
+  --accent-foreground: #402b20;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --border: #e8dfd2;
+  --input: #e8dfd2;
+  --ring: #c6a16b;
+  --chart-1: #c6a16b;
+  --chart-2: #806c5d;
+  --chart-3: #402b20;
+  --chart-4: #a78655;
+  --chart-5: #76533c;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #faf7f2;
+  --sidebar-foreground: #402b20;
+  --sidebar-primary: #402b20;
+  --sidebar-primary-foreground: #faf7f2;
+  --sidebar-accent: #f5eddf;
+  --sidebar-accent-foreground: #402b20;
+  --sidebar-border: #e8dfd2;
+  --sidebar-ring: #c6a16b;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: #1c1613;
+  --foreground: #faf7f2;
+  --card: #30231d;
+  --card-foreground: #faf7f2;
+  --popover: #30231d;
+  --popover-foreground: #faf7f2;
+  --primary: #c6a16b;
+  --primary-foreground: #1c1613;
+  --secondary: #281d18;
+  --secondary-foreground: #faf7f2;
+  --muted: #281d18;
+  --muted-foreground: #c4b4a7;
+  --accent: #382a22;
+  --accent-foreground: #faf7f2;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --border: #49372b;
+  --input: #281d18;
+  --ring: #c6a16b;
+  --chart-1: #c6a16b;
+  --chart-2: #c4b4a7;
+  --chart-3: #49372b;
+  --chart-4: #d6b27c;
+  --chart-5: #382a22;
+  --sidebar: #1c1613;
+  --sidebar-foreground: #faf7f2;
+  --sidebar-primary: #c6a16b;
+  --sidebar-primary-foreground: #1c1613;
+  --sidebar-accent: #281d18;
+  --sidebar-accent-foreground: #faf7f2;
+  --sidebar-border: #49372b;
+  --sidebar-ring: #c6a16b;
 }
 
 @layer base {

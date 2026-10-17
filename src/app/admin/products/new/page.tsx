@@ -12,7 +12,7 @@ import {
 } from "@/services/productService";
 
 const inputStyle =
-  "w-full rounded-lg border border-[#eadfce] bg-white px-4 py-3 text-sm text-[#402b20] outline-none transition focus:border-[#a78655]";
+  "w-full rounded-lg border border-[#eadfce] bg-white px-4 py-3 text-sm text-[#402b20] outline-none transition focus:border-[#a78655] dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:placeholder-[#806b5b] dark:focus:border-[#c6a16b]";
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -221,34 +221,34 @@ export default function NewProductPage() {
   const previewSource = imageFile ? filePreview : imageUrl.trim();
 
   return (
-    <main className="min-h-screen bg-[#faf7f2] px-4 py-8 text-[#402b20] sm:px-8">
+    <main className="min-h-screen bg-[#faf7f2] px-4 py-8 text-[#402b20] transition-colors dark:bg-[#1c1613] dark:text-[#faf7f2] sm:px-8">
       <div className="mx-auto max-w-4xl">
         <header className="mb-8">
-          <p className="text-sm font-medium uppercase tracking-[0.25em] text-[#a78655]">
+          <p className="text-sm font-medium uppercase tracking-[0.25em] text-[#a78655] dark:text-[#c6a16b]">
             Shop Selina
           </p>
 
-          <h1 className="mt-2 text-3xl font-bold">
+          <h1 className="mt-2 text-3xl font-bold text-[#402b20] dark:text-[#faf7f2]">
             Add New Product
           </h1>
 
-          <p className="mt-2 text-sm text-[#806f63]">
+          <p className="mt-2 text-sm text-[#806f63] dark:text-[#c4b4a7]">
             Add a new product to your store.
           </p>
 
           <Link
             href="/admin/products"
-            className="mt-5 inline-block text-sm font-medium text-[#806f63] transition hover:text-[#a78655]"
+            className="mt-5 inline-block text-sm font-medium text-[#806f63] transition hover:text-[#a78655] dark:text-[#c4b4a7] dark:hover:text-[#c6a16b]"
           >
             ← Back to Products
           </Link>
         </header>
 
-        <section className="rounded-2xl border border-[#eadfce] bg-white p-5 shadow-sm sm:p-8">
+        <section className="rounded-2xl border border-[#eadfce] bg-white p-5 shadow-sm transition-colors dark:border-[#49372b] dark:bg-[#30231d] sm:p-8">
           {error && (
             <div
               role="alert"
-              className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+              className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300"
             >
               <p className="font-semibold">
                 Unable to create product
@@ -260,7 +260,7 @@ export default function NewProductPage() {
           {success && (
             <div
               role="status"
-              className="mb-5 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700"
+              className="mb-5 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700 dark:border-green-900/50 dark:bg-green-950/30 dark:text-green-300"
             >
               {success}
             </div>
@@ -270,7 +270,7 @@ export default function NewProductPage() {
             <div>
               <label
                 htmlFor="title"
-                className="mb-2 block text-sm font-medium"
+                className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
               >
                 Product Name *
               </label>
@@ -290,7 +290,7 @@ export default function NewProductPage() {
             <div>
               <label
                 htmlFor="price"
-                className="mb-2 block text-sm font-medium"
+                className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
               >
                 Price (USD) *
               </label>
@@ -311,7 +311,7 @@ export default function NewProductPage() {
             <div>
               <label
                 htmlFor="description"
-                className="mb-2 block text-sm font-medium"
+                className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
               >
                 Description *
               </label>
@@ -331,7 +331,7 @@ export default function NewProductPage() {
             <div>
               <label
                 htmlFor="category"
-                className="mb-2 block text-sm font-medium"
+                className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
               >
                 Category *
               </label>
@@ -344,7 +344,7 @@ export default function NewProductPage() {
                 disabled={loadingCategories || categories.length === 0}
                 className={inputStyle}
               >
-                <option value="">
+                <option value="" className="dark:bg-[#281d18]">
                   {loadingCategories
                     ? "Loading categories..."
                     : categories.length === 0
@@ -353,14 +353,14 @@ export default function NewProductPage() {
                 </option>
 
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <option key={category.id} value={category.id} className="dark:bg-[#281d18]">
                     {category.name}
                   </option>
                 ))}
               </select>
 
               {!loadingCategories && categories.length === 0 && (
-                <p className="mt-2 text-xs text-[#806f63]">
+                <p className="mt-2 text-xs text-[#806f63] dark:text-[#c4b4a7]">
                   No categories are available. Please try again later
                   or create a category first.
                 </p>
@@ -370,7 +370,7 @@ export default function NewProductPage() {
             <div>
               <label
                 htmlFor="imageUrl"
-                className="mb-2 block text-sm font-medium"
+                className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
               >
                 Product Image URL
               </label>
@@ -388,7 +388,7 @@ export default function NewProductPage() {
                 placeholder="https://example.com/product.jpg"
               />
 
-              <p className="mt-2 text-xs text-[#806f63]">
+              <p className="mt-2 text-xs text-[#806f63] dark:text-[#c4b4a7]">
                 Paste an image URL, or upload an image below.
               </p>
             </div>
@@ -396,7 +396,7 @@ export default function NewProductPage() {
             <div>
               <label
                 htmlFor="imageFile"
-                className="mb-2 block text-sm font-medium"
+                className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
               >
                 Upload From Your Computer
               </label>
@@ -406,10 +406,10 @@ export default function NewProductPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleImageFileChange}
-                className={`${inputStyle} file:mr-4 file:rounded-md file:border-0 file:bg-[#402b20] file:px-4 file:py-2 file:text-sm file:text-white`}
+                className={`${inputStyle} file:mr-4 file:rounded-md file:border-0 file:bg-[#402b20] file:px-4 file:py-2 file:text-sm file:text-white dark:file:bg-[#c6a16b] dark:file:text-[#1c1613]`}
               />
 
-              <p className="mt-2 text-xs text-[#806f63]">
+              <p className="mt-2 text-xs text-[#806f63] dark:text-[#c4b4a7]">
                 Images only, up to 5 MB.
               </p>
 
@@ -417,7 +417,7 @@ export default function NewProductPage() {
                 <button
                   type="button"
                   onClick={() => setImageFile(null)}
-                  className="mt-2 text-sm text-red-600 hover:underline"
+                  className="mt-2 text-sm text-red-600 hover:underline dark:text-red-400"
                 >
                   Remove uploaded image
                 </button>
@@ -425,7 +425,7 @@ export default function NewProductPage() {
 
               {previewSource && (
                 <div className="mt-4">
-                  <p className="mb-2 text-xs text-[#806f63]">
+                  <p className="mb-2 text-xs text-[#806f63] dark:text-[#c4b4a7]">
                     Image Preview
                   </p>
 
@@ -433,7 +433,7 @@ export default function NewProductPage() {
                     key={previewSource}
                     src={previewSource}
                     alt="Product preview"
-                    className="h-40 w-40 rounded-xl border border-[#eadfce] bg-[#faf7f2] object-contain p-2"
+                    className="h-40 w-40 rounded-xl border border-[#eadfce] bg-[#faf7f2] object-contain p-2 dark:border-[#49372b] dark:bg-[#281d18]"
                     onError={(event) => {
                       event.currentTarget.style.visibility = "hidden";
                     }}
@@ -445,7 +445,7 @@ export default function NewProductPage() {
               )}
             </div>
 
-            <div className="flex flex-wrap gap-3 border-t border-[#eadfce] pt-6">
+            <div className="flex flex-wrap gap-3 border-t border-[#eadfce] pt-6 dark:border-[#49372b]">
               <button
                 type="submit"
                 disabled={
@@ -453,14 +453,14 @@ export default function NewProductPage() {
                   loadingCategories ||
                   categories.length === 0
                 }
-                className="rounded-lg bg-[#402b20] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#604333] disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg bg-[#402b20] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#604333] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#c6a16b] dark:text-[#1c1613] dark:hover:bg-[#d6b27c]"
               >
                 {saving ? "Creating Product..." : "Create Product"}
               </button>
 
               <Link
                 href="/admin/products"
-                className="rounded-lg border border-[#eadfce] px-6 py-3 text-sm transition hover:bg-[#faf7f2]"
+                className="rounded-lg border border-[#eadfce] px-6 py-3 text-sm transition hover:bg-[#faf7f2] dark:border-[#49372b] dark:text-[#faf7f2] dark:hover:bg-[#382a22]"
               >
                 Cancel
               </Link>
@@ -468,7 +468,7 @@ export default function NewProductPage() {
           </form>
         </section>
 
-        <p className="mt-5 text-xs leading-5 text-[#806f63]">
+        <p className="mt-5 text-xs leading-5 text-[#806f63] dark:text-[#c4b4a7]">
           Uploaded images must be accepted by the image API and return a
           public URL to appear on the storefront. Shop Selina uses a
           shared public API, so avoid modifying or deleting existing

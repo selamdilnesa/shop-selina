@@ -31,10 +31,10 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#faf7f2] text-[#4a2c11]">
+    <div className="min-h-screen bg-[#faf7f2] text-[#402b20] transition-colors dark:bg-[#1c1613] dark:text-[#faf7f2]">
       <main className="mx-auto max-w-5xl px-6 py-12">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-3xl font-bold tracking-tight text-[#4a2c11] sm:text-4xl">
+          <h1 className="text-3xl font-bold tracking-tight text-[#402b20] dark:text-[#faf7f2] sm:text-4xl">
             Shopping Cart
           </h1>
 
@@ -42,7 +42,7 @@ export default function CartPage() {
             <button
               type="button"
               onClick={handleClearCart}
-              className="rounded-full border border-[#d4af37]/50 bg-white px-5 py-2.5 text-sm font-semibold text-[#8b5a2b] transition hover:bg-[#4a2c11] hover:text-white"
+              className="rounded-full border border-[#d4af37]/50 bg-white px-5 py-2.5 text-sm font-semibold text-[#8b5a2b] transition hover:bg-[#402b20] hover:text-white dark:border-[#49372b] dark:bg-[#30231d] dark:text-[#c6a16b] dark:hover:bg-[#49372b] dark:hover:text-[#faf7f2]"
             >
               🗑️ Clear Cart
             </button>
@@ -52,27 +52,27 @@ export default function CartPage() {
         {showClearMessage && cart.length === 0 && (
           <div
             role="status"
-            className="mt-6 rounded-xl border border-[#d4af37]/30 bg-white p-4 text-center text-sm font-medium text-[#8b5a2b]"
+            className="mt-6 rounded-xl border border-[#d4af37]/30 bg-white p-4 text-center text-sm font-medium text-[#8b5a2b] dark:border-[#49372b] dark:bg-[#30231d] dark:text-[#c6a16b]"
           >
             Your cart has been cleared successfully.
           </div>
         )}
 
         {cart.length === 0 ? (
-          <div className="mt-12 rounded-2xl border border-[#d4af37]/20 bg-white p-8 py-16 text-center shadow-sm">
+          <div className="mt-12 rounded-2xl border border-[#d4af37]/20 bg-white p-8 py-16 text-center shadow-sm dark:border-[#49372b] dark:bg-[#30231d]">
             <div className="mb-4 text-5xl">🛍️</div>
 
-            <h2 className="text-xl font-bold text-[#4a2c11]">
+            <h2 className="text-xl font-bold text-[#402b20] dark:text-[#faf7f2]">
               Your cart is empty
             </h2>
 
-            <p className="mt-2 text-stone-600">
+            <p className="mt-2 text-stone-600 dark:text-[#c4b4a7]">
               Looks like you haven't added anything yet.
             </p>
 
             <Link
               href="/products"
-              className="mt-6 inline-block rounded-full bg-[#4a2c11] px-6 py-3 font-medium text-[#fdfbf7] transition hover:bg-[#38200b]"
+              className="mt-6 inline-block rounded-full bg-[#402b20] px-6 py-3 font-medium text-[#faf7f2] transition hover:bg-[#593d2e] dark:bg-[#c6a16b] dark:text-[#1c1613] dark:hover:bg-[#d6b27c]"
             >
               Explore Products
             </Link>
@@ -83,9 +83,9 @@ export default function CartPage() {
               {cart.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center gap-4 rounded-xl border border-[#d4af37]/20 bg-white p-4 shadow-sm"
+                  className="flex items-center gap-4 rounded-xl border border-[#d4af37]/20 bg-white p-4 shadow-sm dark:border-[#49372b] dark:bg-[#30231d]"
                 >
-                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[#faf7f2] p-2">
+                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[#faf7f2] p-2 dark:bg-[#281d18]">
                     <img
                       src={item.images?.[0] || "/placeholder.webp"}
                       alt={item.title}
@@ -94,16 +94,16 @@ export default function CartPage() {
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <h3 className="truncate font-semibold text-[#4a2c11]">
+                    <h3 className="truncate font-semibold text-[#402b20] dark:text-[#faf7f2]">
                       {item.title}
                     </h3>
 
-                    <p className="text-sm font-bold text-[#8b5a2b]">
+                    <p className="text-sm font-bold text-[#8b5a2b] dark:text-[#c6a16b]">
                       ${item.price.toFixed(2)}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 rounded-full border border-[#d4af37]/40 bg-[#fdfbf7] p-1">
+                  <div className="flex items-center gap-2 rounded-full border border-[#d4af37]/40 bg-[#fdfbf7] p-1 dark:border-[#49372b] dark:bg-[#281d18]">
                     <button
                       type="button"
                       aria-label={`Decrease quantity of ${item.title}`}
@@ -112,12 +112,12 @@ export default function CartPage() {
                           ? updateQuantity(item.id, item.quantity - 1)
                           : removeFromCart(item.id)
                       }
-                      className="flex h-7 w-7 items-center justify-center rounded-full border border-[#d4af37]/30 bg-[#faf7f2] font-bold text-[#4a2c11] transition hover:bg-[#4a2c11] hover:text-white"
+                      className="flex h-7 w-7 items-center justify-center rounded-full border border-[#d4af37]/30 bg-[#faf7f2] font-bold text-[#402b20] transition hover:bg-[#402b20] hover:text-white dark:border-[#49372b] dark:bg-[#30231d] dark:text-[#faf7f2] dark:hover:bg-[#49372b]"
                     >
                       −
                     </button>
 
-                    <span className="min-w-[1.25rem] text-center text-sm font-bold">
+                    <span className="min-w-[1.25rem] text-center text-sm font-bold text-[#402b20] dark:text-[#faf7f2]">
                       {item.quantity}
                     </span>
 
@@ -127,7 +127,7 @@ export default function CartPage() {
                       onClick={() =>
                         updateQuantity(item.id, item.quantity + 1)
                       }
-                      className="flex h-7 w-7 items-center justify-center rounded-full border border-[#d4af37]/30 bg-[#faf7f2] font-bold text-[#4a2c11] transition hover:bg-[#4a2c11] hover:text-white"
+                      className="flex h-7 w-7 items-center justify-center rounded-full border border-[#d4af37]/30 bg-[#faf7f2] font-bold text-[#402b20] transition hover:bg-[#402b20] hover:text-white dark:border-[#49372b] dark:bg-[#30231d] dark:text-[#faf7f2] dark:hover:bg-[#49372b]"
                     >
                       +
                     </button>
@@ -137,7 +137,7 @@ export default function CartPage() {
                     type="button"
                     aria-label={`Remove ${item.title} from cart`}
                     onClick={() => removeFromCart(item.id)}
-                    className="text-sm font-medium text-red-600 transition hover:text-red-800"
+                    className="text-sm font-medium text-red-600 transition hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                   >
                     Remove
                   </button>
@@ -145,22 +145,22 @@ export default function CartPage() {
               ))}
             </div>
 
-            <div className="h-fit rounded-xl border border-[#d4af37]/30 bg-white p-6 shadow-md">
-              <h2 className="text-xl font-bold text-[#4a2c11]">
+            <div className="h-fit rounded-xl border border-[#d4af37]/30 bg-white p-6 shadow-md dark:border-[#49372b] dark:bg-[#30231d]">
+              <h2 className="text-xl font-bold text-[#402b20] dark:text-[#faf7f2]">
                 Order Summary
               </h2>
 
-              <div className="mt-4 flex justify-between border-t border-[#d4af37]/20 pt-4 text-lg font-semibold">
-                <span>Total</span>
+              <div className="mt-4 flex justify-between border-t border-[#d4af37]/20 pt-4 text-lg font-semibold dark:border-[#49372b]">
+                <span className="text-[#402b20] dark:text-[#faf7f2]">Total</span>
 
-                <span className="text-[#8b5a2b]">
+                <span className="text-[#8b5a2b] dark:text-[#c6a16b]">
                   ${subtotal.toFixed(2)}
                 </span>
               </div>
 
               <Link
                 href="/checkout"
-                className="mt-6 block w-full rounded-full bg-[#4a2c11] py-3 text-center font-semibold text-[#fdfbf7] shadow-md transition hover:bg-[#38200b]"
+                className="mt-6 block w-full rounded-full bg-[#402b20] py-3 text-center font-semibold text-[#faf7f2] shadow-md transition hover:bg-[#593d2e] dark:bg-[#c6a16b] dark:text-[#1c1613] dark:hover:bg-[#d6b27c]"
               >
                 Proceed to Checkout
               </Link>

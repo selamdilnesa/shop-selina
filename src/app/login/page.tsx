@@ -6,185 +6,184 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
-const router = useRouter();
-const { refreshUser } = useAuth();
+  const router = useRouter();
+  const { refreshUser } = useAuth();
 
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
-const [error, setError] = useState("");
-const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
-e.preventDefault();
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
+    if (loading) return;
 
-if (loading) return;
+    setError("");
 
-setError("");
-
-if (!email.trim() || !password) {
-  setError("Please enter your email and password.");
-  return;
-}
-
-setLoading(true);
-
-try {
-  const response = await fetch(
-    "https://api.escuelajs.co/api/v1/auth/login",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email.trim(),
-        password,
-      }),
+    if (!email.trim() || !password) {
+      setError("Please enter your email and password.");
+      return;
     }
-  );
 
-  const data = await response.json();
+    setLoading(true);
 
-  if (!response.ok || !data.access_token) {
-    setError(
-      response.status === 401
-        ? "Incorrect email or password. Please try again."
-        : "Login failed. Please check your details and try again."
-    );
-    return;
-  }
+    try {
+      const response = await fetch(
+        "https://api.escuelajs.co/api/v1/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email.trim(),
+            password,
+          }),
+        }
+      );
 
-  localStorage.setItem("access_token", data.access_token);
+      const data = await response.json();
 
-  if (data.refresh_token) {
-    localStorage.setItem("refresh_token", data.refresh_token);
-  } else {
-    localStorage.removeItem("refresh_token");
-  }
+      if (!response.ok || !data.access_token) {
+        setError(
+          response.status === 401
+            ? "Incorrect email or password. Please try again."
+            : "Login failed. Please check your details and try again."
+        );
+        return;
+      }
 
-  // Load the logged-in user's actual profile and role.
-  await refreshUser();
+      localStorage.setItem("access_token", data.access_token);
 
-  // Check the role directly from the API to avoid using stale React state.
-  const profileResponse = await fetch(
-    "https://api.escuelajs.co/api/v1/auth/profile",
-    {
-      headers: {
-        Authorization: `Bearer ${data.access_token}`,
-      },
+      if (data.refresh_token) {
+        localStorage.setItem("refresh_token", data.refresh_token);
+      } else {
+        localStorage.removeItem("refresh_token");
+      }
+
+      // Load the logged-in user's actual profile and role.
+      await refreshUser();
+
+      // Check the role directly from the API to avoid using stale React state.
+      const profileResponse = await fetch(
+        "https://api.escuelajs.co/api/v1/auth/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${data.access_token}`,
+          },
+        }
+      );
+
+      if (!profileResponse.ok) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        setError("Unable to verify your account. Please sign in again.");
+        return;
+      }
+
+      const profile = await profileResponse.json();
+
+      if (profile.role === "admin") {
+        router.replace("/admin");
+      } else {
+        router.replace("/profile");
+      }
+    } catch {
+      setError("Unable to connect to the server. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  );
-
-  if (!profileResponse.ok) {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    setError("Unable to verify your account. Please sign in again.");
-    return;
   }
 
-  const profile = await profileResponse.json();
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-[#faf7f2] px-4 py-12 transition-colors dark:bg-[#1c1613]">
+      <div className="w-full max-w-md rounded-2xl border border-[#e8dfd2] bg-white p-8 shadow-sm transition-colors dark:border-[#49372b] dark:bg-[#30231d] sm:p-10">
+        <div className="mb-8 text-center">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#a78655] dark:text-[#c6a16b]">
+            Welcome Back
+          </p>
 
-  if (profile.role === "admin") {
-    router.replace("/admin");
-  } else {
-    router.replace("/profile");
-  }
-} catch {
-  setError("Unable to connect to the server. Please try again.");
-} finally {
-  setLoading(false);
-}
+          <h1 className="text-3xl font-semibold text-[#402b20] dark:text-[#faf7f2]">
+            Sign In
+          </h1>
 
+          <p className="mt-3 text-sm text-[#786b60] dark:text-[#c4b4a7]">
+            Sign in to your Shop Selina account.
+          </p>
+        </div>
 
-}
+        <form onSubmit={handleLogin} className="space-y-5 text-[#402b20] dark:text-[#faf7f2]">
+          <div>
+            <label
+              htmlFor="email"
+              className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
+            >
+              Email Address
+            </label>
 
-return ( <main className="flex min-h-screen items-center justify-center bg-[#faf7f2] px-4 py-12"> <div className="w-full max-w-md rounded-2xl border border-[#e8dfd2] bg-white p-8 shadow-sm sm:p-10"> <div className="mb-8 text-center"> <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#a78655]">
-Welcome Back </p>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+              disabled={loading}
+              className="w-full rounded-lg border border-[#e8dfd2] bg-white px-4 py-3 text-sm text-[#402b20] outline-none focus:border-[#a78655] disabled:opacity-60 dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:placeholder-[#806b5b] dark:focus:border-[#c6a16b]"
+            />
+          </div>
 
-```
-      <h1 className="text-3xl font-semibold text-[#402b20]">
-        Sign In
-      </h1>
+          <div>
+            <label
+              htmlFor="password"
+              className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
+            >
+              Password
+            </label>
 
-      <p className="mt-3 text-sm text-[#786b60]">
-        Sign in to your Shop Selina account.
-      </p>
-    </div>
+            <input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+              disabled={loading}
+              className="w-full rounded-lg border border-[#e8dfd2] bg-white px-4 py-3 text-sm text-[#402b20] outline-none focus:border-[#a78655] disabled:opacity-60 dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:placeholder-[#806b5b] dark:focus:border-[#c6a16b]"
+            />
+          </div>
 
-    <form onSubmit={handleLogin} className="space-y-5 text-[#402b20]">
-      <div>
-        <label
-          htmlFor="email"
-          className="mb-2 block text-sm font-medium text-[#402b20]"
-        >
-          Email Address
-        </label>
+          {error && (
+            <p
+              role="alert"
+              className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300"
+            >
+              {error}
+            </p>
+          )}
 
-        <input
-          id="email"
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          required
-          disabled={loading}
-          className="w-full rounded-lg border border-[#e8dfd2] px-4 py-3 text-sm outline-none focus:border-[#a78655] disabled:opacity-60"
-        />
-      </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-[#402b20] py-3 font-medium text-white transition hover:bg-[#594031] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#c6a16b] dark:text-[#1c1613] dark:hover:bg-[#d6b27c]"
+          >
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
 
-      <div>
-        <label
-          htmlFor="password"
-          className="mb-2 block text-sm font-medium text-[#402b20]"
-        >
-          Password
-        </label>
-
-        <input
-          id="password"
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password"
-          required
-          disabled={loading}
-          className="w-full rounded-lg border border-[#e8dfd2] px-4 py-3 text-sm outline-none focus:border-[#a78655] disabled:opacity-60"
-        />
-      </div>
-
-      {error && (
-        <p
-          role="alert"
-          className="rounded-lg bg-red-50 p-3 text-sm text-red-700"
-        >
-          {error}
+        <p className="mt-6 text-center text-sm text-[#786b60] dark:text-[#c4b4a7]">
+          Don't have an account?{" "}
+          <Link
+            href="/register"
+            className="font-semibold text-[#a78655] hover:underline dark:text-[#c6a16b]"
+          >
+            Register
+          </Link>
         </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-lg bg-[#402b20] py-3 font-medium text-white transition hover:bg-[#594031] disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {loading ? "Signing in..." : "Sign In"}
-      </button>
-    </form>
-
-    <p className="mt-6 text-center text-sm text-[#786b60]">
-      Don't have an account?{" "}
-      <Link
-        href="/register"
-        className="font-semibold text-[#a78655] hover:underline"
-      >
-        Register
-      </Link>
-    </p>
-  </div>
-</main>
-
-
-);
+      </div>
+    </main>
+  );
 }

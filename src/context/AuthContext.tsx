@@ -24,6 +24,7 @@ type AuthContextType = {
   logout: () => void;
   updateAvatar: (avatar: string) => void;
   updateName: (name: string) => void;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -61,13 +62,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const profile: User = await response.json();
        
-    const savedAvatar = localStorage.getItem("custom_profile_avatar");
+      const savedAvatar = localStorage.getItem("custom_profile_avatar");
       const savedName = localStorage.getItem("custom_profile_name");
 
       setUser({
         ...profile,
         name: savedName || profile.name,
-       avatar: savedAvatar || undefined,
+        avatar: savedAvatar || undefined,
       });
     } catch (error) {
       console.error("Failed to load authenticated profile:", error);
@@ -123,12 +124,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function logout() {
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
 
-  setUser(null);
-  setLoading(false);
-}
+    setUser(null);
+    setLoading(false);
+  }
+
+  async function register(name: string, email: string, password: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_URL}/users/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          avatar: "https://api.escuelajs.co/api/v1/files/sample.png",
+          role: "customer",
+        }),
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Failed to register user:", error);
+      return false;
+    }
+  }
 
   return (
     <AuthContext.Provider
@@ -140,6 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         updateAvatar,
         updateName,
+        register,
       }}
     >
       {children}

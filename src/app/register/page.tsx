@@ -105,21 +105,21 @@ export default function RegisterPage() {
   }
 
   const inputStyle =
-    "w-full rounded-lg border border-[#e8dfd2] bg-[#fffdf9] px-4 py-3 text-sm text-[#402b20] placeholder:text-[#a78655]/70 outline-none focus:border-[#a78655] focus:ring-1 focus:ring-[#a78655] disabled:opacity-60";
+    "w-full rounded-lg border border-[#e8dfd2] bg-[#fffdf9] px-4 py-3 text-sm text-[#402b20] placeholder:text-[#a78655]/70 outline-none focus:border-[#a78655] focus:ring-1 focus:ring-[#a78655] disabled:opacity-60 dark:border-[#49372b] dark:bg-[#281d18] dark:text-[#faf7f2] dark:placeholder-[#c4b4a7]/60 dark:focus:border-[#c6a16b]";
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#faf7f2] px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl border border-[#e8dfd2] bg-white p-8 shadow-sm sm:p-10">
+    <main className="flex min-h-screen items-center justify-center bg-[#faf7f2] px-4 py-12 transition-colors dark:bg-[#1c1613] dark:text-[#faf7f2]">
+      <div className="w-full max-w-md rounded-2xl border border-[#e8dfd2] bg-white p-8 shadow-sm transition-colors dark:border-[#49372b] dark:bg-[#30231d] sm:p-10">
         <div className="mb-8 text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#a78655]">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#a78655] dark:text-[#c6a16b]">
             Join Us
           </p>
 
-          <h1 className="text-3xl font-semibold text-[#402b20]">
+          <h1 className="text-3xl font-semibold text-[#402b20] dark:text-[#faf7f2]">
             Create Account
           </h1>
 
-          <p className="mt-3 text-sm text-[#786b60]">
+          <p className="mt-3 text-sm text-[#786b60] dark:text-[#c4b4a7]">
             Create your Shop Selina account and get started.
           </p>
         </div>
@@ -128,7 +128,7 @@ export default function RegisterPage() {
           <div>
             <label
               htmlFor="name"
-              className="mb-2 block text-sm font-medium text-[#402b20]"
+              className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
             >
               Full Name
             </label>
@@ -149,7 +149,7 @@ export default function RegisterPage() {
           <div>
             <label
               htmlFor="email"
-              className="mb-2 block text-sm font-medium text-[#402b20]"
+              className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
             >
               Email Address
             </label>
@@ -170,7 +170,7 @@ export default function RegisterPage() {
           <div>
             <label
               htmlFor="password"
-              className="mb-2 block text-sm font-medium text-[#402b20]"
+              className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
             >
               Password
             </label>
@@ -192,7 +192,7 @@ export default function RegisterPage() {
           <div>
             <label
               htmlFor="confirmPassword"
-              className="mb-2 block text-sm font-medium text-[#402b20]"
+              className="mb-2 block text-sm font-medium text-[#402b20] dark:text-[#faf7f2]"
             >
               Confirm Password
             </label>
@@ -213,7 +213,7 @@ export default function RegisterPage() {
           {error && (
             <p
               role="alert"
-              className="rounded-lg bg-red-50 p-3 text-sm text-red-700"
+              className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300"
             >
               {error}
             </p>
@@ -222,7 +222,7 @@ export default function RegisterPage() {
           {success && (
             <p
               role="status"
-              className="rounded-lg bg-green-50 p-3 text-sm text-green-700"
+              className="rounded-lg bg-green-50 p-3 text-sm text-green-700 dark:bg-green-950/30 dark:text-green-300"
             >
               {success}
             </p>
@@ -231,17 +231,17 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-[#402b20] py-3 font-medium text-white transition hover:bg-[#594031] disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-lg bg-[#402b20] py-3 font-medium text-white transition hover:bg-[#594031] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#c6a16b] dark:text-[#1c1613] dark:hover:bg-[#d6b27c]"
           >
             {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-[#786b60]">
+        <p className="mt-6 text-center text-sm text-[#786b60] dark:text-[#c4b4a7]">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-semibold text-[#a78655] hover:underline"
+            className="font-semibold text-[#a78655] hover:underline dark:text-[#c6a16b]"
           >
             Sign In
           </Link>

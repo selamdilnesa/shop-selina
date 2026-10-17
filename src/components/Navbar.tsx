@@ -92,7 +92,7 @@ function ProfileAvatar({
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-full border border-[#d4af6a] bg-[#faf7f2] font-semibold text-[#402b20] ${
+      className={`inline-flex shrink-0 items-center justify-center rounded-full border border-[#d4af6a] bg-[#faf7f2] font-semibold text-[#402b20] dark:border-[#c6a16b] dark:bg-[#281d18] dark:text-[#faf7f2] ${
         isSmall ? "h-8 w-8 text-xs" : "h-9 w-9 text-sm"
       }`}
       aria-label={`${name || "User"} profile`}
@@ -181,7 +181,7 @@ function ThemeSwitcher() {
               <span>{option.icon}</span>
               <span>{option.name}</span>
               {theme === option.value && (
-                <span className="ml-auto text-[#a78655]">✓</span>
+                <span className="ml-auto text-[#a78655] dark:text-[#c6a16b]">✓</span>
               )}
             </button>
           ))}
@@ -246,12 +246,11 @@ export default function Navbar() {
     setMenuOpen(false);
   }, [pathname]);
 
-  // Admin navbar: logo on the left, hamburger on the far right.
+  // Admin navbar
   if (pathname.startsWith("/admin")) {
     return (
-      <header className="sticky top-0 z-50 w-full border-b border-[#eadfce] bg-white/95 px-4 py-3 shadow-sm backdrop-blur-md dark:border-[#49372b] dark:bg-[#211a16]/95 sm:px-8">
+      <header className="sticky top-0 z-50 w-full border-b border-[#eadfce] bg-white/95 px-4 py-3 shadow-sm backdrop-blur-md transition-colors dark:border-[#49372b] dark:bg-[#211a16]/95 sm:px-8">
         <nav className="flex items-center justify-between gap-4">
-          {/* Logo on the left */}
           <Link href="/admin" className="flex min-w-0 items-center gap-2">
             <Image
               src="/logo.webp"
@@ -259,7 +258,15 @@ export default function Navbar() {
               width={100}
               height={50}
               priority
-              className="h-10 w-auto object-contain"
+              className="h-10 w-auto object-contain dark:hidden"
+            />
+            <Image
+              src="/darkLogo.jpg"
+              alt="Shop Selina logo"
+              width={100}
+              height={50}
+              priority
+              className="hidden h-10 w-auto object-contain dark:block"
             />
 
             <span className="whitespace-nowrap text-lg font-bold tracking-wide text-[#402b20] dark:text-[#faf7f2] sm:text-xl">
@@ -267,11 +274,10 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Actions on the right */}
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <Link
               href="/"
-              className="hidden rounded-lg border border-[#d4af6a] px-4 py-2 text-sm font-medium text-[#402b20] transition hover:bg-[#f0e5d4] dark:text-[#faf7f2] dark:hover:bg-[#49372b] sm:block"
+              className="hidden rounded-lg border border-[#d4af6a] px-4 py-2 text-sm font-medium text-[#402b20] transition hover:bg-[#f0e5d4] dark:border-[#c6a16b] dark:text-[#faf7f2] dark:hover:bg-[#49372b] sm:block"
             >
               View Store →
             </Link>
@@ -295,9 +301,9 @@ export default function Navbar() {
     );
   }
 
-  // Regular store navbar remains unchanged.
+  // Regular store navbar
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#e8dfd2] bg-white/95 px-3 py-3 shadow-sm backdrop-blur-md sm:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-[#e8dfd2] bg-white/95 px-3 py-3 shadow-sm backdrop-blur-md transition-colors dark:border-[#49372b] dark:bg-[#211a16]/95 sm:px-8">
       <nav className="flex items-center justify-between gap-2 sm:gap-4">
         <Link
           href="/"
@@ -309,15 +315,23 @@ export default function Navbar() {
             width={400}
             height={200}
             priority
-            className="h-10 w-auto object-contain sm:h-16"
+            className="h-10 w-auto object-contain dark:hidden sm:h-16"
+          />
+          <Image
+            src="/darkLogo.jpg"
+            alt="Shop Selina logo"
+            width={400}
+            height={200}
+            priority
+            className="hidden h-10 w-auto object-contain dark:block sm:h-16"
           />
 
-          <span className="whitespace-nowrap text-sm font-bold uppercase tracking-wide text-[#402b20] sm:text-2xl sm:tracking-wider lg:text-3xl">
+          <span className="whitespace-nowrap text-sm font-bold uppercase tracking-wide text-[#402b20] dark:text-[#faf7f2] sm:text-2xl sm:tracking-wider lg:text-3xl">
             Shop Selina
           </span>
         </Link>
 
-        <div className="hidden items-center gap-5 text-[#402b20] md:flex lg:gap-7">
+        <div className="hidden items-center gap-5 text-[#402b20] dark:text-[#faf7f2] md:flex lg:gap-7">
           {links.slice(0, 3).map((link) => {
             const active = isActive(link.href);
 
@@ -326,15 +340,15 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
-                className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] ${
-                  active ? "text-[#a78655]" : "text-[#402b20]"
+                className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] dark:hover:text-[#c6a16b] ${
+                  active ? "text-[#a78655] dark:text-[#c6a16b]" : "text-[#402b20] dark:text-[#faf7f2]"
                 }`}
               >
                 <NavIcon name={link.name} />
                 {link.name}
 
                 {active && (
-                  <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a]" />
+                  <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a] dark:bg-[#c6a16b]" />
                 )}
               </Link>
             );
@@ -343,21 +357,21 @@ export default function Navbar() {
           <Link
             href="/cart"
             aria-current={isActive("/cart") ? "page" : undefined}
-            className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] ${
-              isActive("/cart") ? "text-[#a78655]" : "text-[#402b20]"
+            className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] dark:hover:text-[#c6a16b] ${
+              isActive("/cart") ? "text-[#a78655] dark:text-[#c6a16b]" : "text-[#402b20] dark:text-[#faf7f2]"
             }`}
           >
             <NavIcon name="Cart" />
             Cart
 
             {cartCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d4af6a] px-1 text-[10px] font-bold text-[#402b20]">
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d4af6a] px-1 text-[10px] font-bold text-[#402b20] dark:bg-[#c6a16b] dark:text-[#1c1613]">
                 {cartCount}
               </span>
             )}
 
             {isActive("/cart") && (
-              <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a]" />
+              <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a] dark:bg-[#c6a16b]" />
             )}
           </Link>
 
@@ -369,8 +383,8 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
-                className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] ${
-                  active ? "text-[#a78655]" : "text-[#402b20]"
+                className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] dark:hover:text-[#c6a16b] ${
+                  active ? "text-[#a78655] dark:text-[#c6a16b]" : "text-[#402b20] dark:text-[#faf7f2]"
                 }`}
               >
                 {link.name === "Profile" && user ? (
@@ -382,7 +396,7 @@ export default function Navbar() {
                 {link.name}
 
                 {active && (
-                  <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a]" />
+                  <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a] dark:bg-[#c6a16b]" />
                 )}
               </Link>
             );
@@ -392,15 +406,15 @@ export default function Navbar() {
             <Link
               href="/admin"
               aria-current={isActive("/admin") ? "page" : undefined}
-              className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] ${
-                isActive("/admin") ? "text-[#a78655]" : "text-[#402b20]"
+              className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] dark:hover:text-[#c6a16b] ${
+                isActive("/admin") ? "text-[#a78655] dark:text-[#c6a16b]" : "text-[#402b20] dark:text-[#faf7f2]"
               }`}
             >
               <NavIcon name="Admin" />
               Admin Dashboard
 
               {isActive("/admin") && (
-                <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a]" />
+                <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a] dark:bg-[#c6a16b]" />
               )}
             </Link>
           )}
@@ -415,14 +429,14 @@ export default function Navbar() {
             href="/cart"
             aria-label={`Shopping cart, ${cartCount} items`}
             aria-current={isActive("/cart") ? "page" : undefined}
-            className={`relative flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-[#faf7f2] ${
-              isActive("/cart") ? "text-[#a78655]" : "text-[#402b20]"
+            className={`relative flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-[#faf7f2] dark:hover:bg-[#30231d] ${
+              isActive("/cart") ? "text-[#a78655] dark:text-[#c6a16b]" : "text-[#402b20] dark:text-[#faf7f2]"
             }`}
           >
             <NavIcon name="Cart" />
 
             {cartCount > 0 && (
-              <span className="absolute right-0.5 top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#d4af6a] px-1 text-[10px] font-bold text-[#402b20]">
+              <span className="absolute right-0.5 top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#d4af6a] px-1 text-[10px] font-bold text-[#402b20] dark:border-[#211a16] dark:bg-[#c6a16b] dark:text-[#1c1613]">
                 {cartCount}
               </span>
             )}
@@ -431,7 +445,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#402b20] transition hover:bg-[#faf7f2]"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#402b20] transition hover:bg-[#faf7f2] dark:text-[#faf7f2] dark:hover:bg-[#30231d]"
             aria-label={
               menuOpen ? "Close navigation menu" : "Open navigation menu"
             }
@@ -473,7 +487,7 @@ export default function Navbar() {
       {menuOpen && (
         <div
           ref={menuRef}
-          className="absolute right-3 top-full z-50 mt-2 flex w-64 flex-col gap-1 rounded-xl border border-[#e8dfd2] bg-white p-3 text-[#402b20] shadow-xl md:hidden"
+          className="absolute right-3 top-full z-50 mt-2 flex w-64 flex-col gap-1 rounded-xl border border-[#e8dfd2] bg-white p-3 text-[#402b20] shadow-xl transition-colors dark:border-[#49372b] dark:bg-[#30231d] dark:text-[#faf7f2] md:hidden"
         >
           {links.map((link) => {
             const active = isActive(link.href);
@@ -486,8 +500,8 @@ export default function Navbar() {
                 aria-current={active ? "page" : undefined}
                 className={`flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-[#faf7f2] text-[#a78655]"
-                    : "text-[#402b20] hover:bg-[#faf7f2]"
+                    ? "bg-[#faf7f2] text-[#a78655] dark:bg-[#382a22] dark:text-[#c6a16b]"
+                    : "text-[#402b20] hover:bg-[#faf7f2] dark:text-[#faf7f2] dark:hover:bg-[#382a22]"
                 }`}
               >
                 <span className="flex items-center gap-3">
@@ -505,7 +519,7 @@ export default function Navbar() {
 
           {!loading && user?.role === "admin" && (
             <>
-              <div className="my-1 border-t border-[#eadfce]" />
+              <div className="my-1 border-t border-[#eadfce] dark:border-[#49372b]" />
 
               <Link
                 href="/admin"
@@ -513,8 +527,8 @@ export default function Navbar() {
                 aria-current={isActive("/admin") ? "page" : undefined}
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${
                   isActive("/admin")
-                    ? "bg-[#f0e5d4] text-[#a78655]"
-                    : "text-[#402b20] hover:bg-[#faf7f2]"
+                    ? "bg-[#f0e5d4] text-[#a78655] dark:bg-[#382a22] dark:text-[#c6a16b]"
+                    : "text-[#402b20] hover:bg-[#faf7f2] dark:text-[#faf7f2] dark:hover:bg-[#382a22]"
                 }`}
               >
                 <NavIcon name="Admin" />
