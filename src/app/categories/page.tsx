@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { getCategories, Category } from "@/services/productService";
 
@@ -13,7 +12,6 @@ export default function CategoriesPage() {
   useEffect(() => {
     getCategories()
       .then((data) => {
-        // Filter out "updated" or invalid category names from the API
         const filtered = (data || []).filter(
           (cat) =>
             cat &&
@@ -32,22 +30,58 @@ export default function CategoriesPage() {
 
   return (
     <div className="min-h-screen bg-[#faf7f2] text-[#402b20]">
-      
-
       <main className="mx-auto max-w-6xl px-6 py-12">
-        <h1 className="text-3xl font-bold tracking-tight">Our Categories</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Our Categories
+        </h1>
+
         <p className="mt-2 text-[#806c5d]">
           Explore our everyday essential collections.
         </p>
 
         {loading && (
-          <div className="mt-12 text-center text-[#806c5d]">
-            Loading categories...
-          </div>
+          <section
+            className="mt-8"
+            aria-label="Loading categories"
+            aria-busy="true"
+          >
+            <div className="mb-6 flex items-center gap-3">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#e5d9c9] border-t-[#a78655]" />
+              <p className="text-sm text-[#806c5d]">
+                Preparing your collection...
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="overflow-hidden rounded-2xl border border-[#e5d9c9] bg-white shadow-sm"
+                >
+                  <div className="relative h-56 overflow-hidden bg-[#f0e9df]">
+                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.8s_infinite] bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+                  </div>
+
+                  <div className="space-y-3 p-5">
+                    <div className="relative h-5 w-2/3 overflow-hidden rounded-md bg-[#eee5d9]">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.8s_infinite] bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+                    </div>
+
+                    <div className="relative h-3 w-1/3 overflow-hidden rounded-md bg-[#f3ede5]">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.8s_infinite] bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
 
         {error && (
-          <div className="mt-12 rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-600">
+          <div
+            role="alert"
+            className="mt-12 rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-600"
+          >
             {error}
           </div>
         )}

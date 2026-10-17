@@ -55,6 +55,12 @@ function NavIcon({ name }: { name: string }) {
         <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
       </>
     ),
+    Admin: (
+      <>
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M8 8h8M8 12h3M8 16h5M16 12h.01M16 16h.01" />
+      </>
+    ),
   };
 
   return (
@@ -119,6 +125,10 @@ export default function Navbar() {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
     if (href === "/login") return pathname === "/login";
@@ -130,7 +140,6 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#e8dfd2] bg-white/95 px-3 py-3 shadow-sm backdrop-blur-md sm:px-8">
       <nav className="flex items-center justify-between gap-2 sm:gap-4">
-        {/* Logo and brand */}
         <Link
           href="/"
           className="flex min-w-0 shrink items-center gap-1.5 sm:gap-3"
@@ -149,7 +158,6 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop navigation */}
         <div className="hidden items-center gap-5 text-[#402b20] md:flex lg:gap-7">
           {links.slice(0, 3).map((link) => {
             const active = isActive(link.href);
@@ -173,7 +181,6 @@ export default function Navbar() {
             );
           })}
 
-          {/* Cart */}
           <Link
             href="/cart"
             aria-current={isActive("/cart") ? "page" : undefined}
@@ -195,7 +202,6 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* Login or Profile */}
           {links.slice(3).map((link) => {
             const active = isActive(link.href);
 
@@ -217,9 +223,25 @@ export default function Navbar() {
               </Link>
             );
           })}
+
+          {!loading && user?.role === "admin" && (
+            <Link
+              href="/admin"
+              aria-current={isActive("/admin") ? "page" : undefined}
+              className={`relative flex items-center gap-2 py-3 text-sm font-medium transition-colors hover:text-[#b18a50] ${
+                isActive("/admin") ? "text-[#a78655]" : "text-[#402b20]"
+              }`}
+            >
+              <NavIcon name="Admin" />
+              Admin Dashboard
+
+              {isActive("/admin") && (
+                <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#d4af6a]" />
+              )}
+            </Link>
+          )}
         </div>
 
-        {/* Mobile cart and hamburger */}
         <div className="ml-auto flex shrink-0 items-center gap-1 md:hidden">
           <Link
             href="/cart"
@@ -280,7 +302,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile dropdown */}
       {menuOpen && (
         <div
           ref={menuRef}
@@ -308,6 +329,26 @@ export default function Navbar() {
               </Link>
             );
           })}
+
+          {!loading && user?.role === "admin" && (
+            <>
+              <div className="my-1 border-t border-[#eadfce]" />
+
+              <Link
+                href="/admin"
+                onClick={() => setMenuOpen(false)}
+                aria-current={isActive("/admin") ? "page" : undefined}
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${
+                  isActive("/admin")
+                    ? "bg-[#f0e5d4] text-[#a78655]"
+                    : "text-[#402b20] hover:bg-[#faf7f2]"
+                }`}
+              >
+                <NavIcon name="Admin" />
+                Admin Dashboard
+              </Link>
+            </>
+          )}
         </div>
       )}
     </header>
