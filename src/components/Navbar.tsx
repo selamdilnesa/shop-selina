@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "next-themes";
 
 function NavIcon({ name }: { name: string }) {
   const paths: Record<string, React.ReactNode> = {
@@ -98,6 +99,84 @@ function ProfileAvatar({
     >
       {initial}
     </span>
+  );
+}
+
+function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme();
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+  const themeRef = useRef<HTMLDivElement>(null);
+
+  const themeOptions = [
+    { name: "Light", value: "light", icon: "☀️" },
+    { name: "Dark", value: "dark", icon: "🌙" },
+    { name: "System", value: "system", icon: "💻" },
+  ];
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (
+        themeRef.current &&
+        !themeRef.current.contains(event.target as Node)
+      ) {
+        setThemeMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div ref={themeRef} className="relative shrink-0">
+      <button
+        type="button"
+        onClick={() => setThemeMenuOpen((open) => !open)}
+        aria-label="Change appearance"
+        aria-expanded={themeMenuOpen}
+        aria-haspopup="menu"
+        title="Change appearance"
+        className="flex h-4 w-3 items-center justify-center rounded-full border border-[#eadfce] bg-[#faf7f2] text-lg transition hover:border-[#d4af6a] hover:bg-[#f0e5d4]"
+      >
+       {theme === "dark" ? "🌙" : "☀️"}
+      </button>
+
+      {themeMenuOpen && (
+        <div
+          role="menu"
+          aria-label="Choose appearance"
+          className="absolute right-0 top-full z-[60] mt-2 w-36 rounded-xl border border-[#eadfce] bg-white p-2 text-[#402b20] shadow-xl"
+        >
+          {themeOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setTheme(option.value);
+                setThemeMenuOpen(false);
+              }}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition hover:bg-[#faf7f2] ${
+                theme === option.value
+                  ? "bg-[#f0e5d4] font-semibold"
+                  : ""
+              }`}
+            >
+              <span>{option.icon}</span>
+              <span>{option.name}</span>
+              {theme === option.value && (
+                <span className="ml-auto text-[#a78655]">✓</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -267,9 +346,13 @@ export default function Navbar() {
               )}
             </Link>
           )}
+
+          <ThemeSwitcher />
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-1 md:hidden">
+          <ThemeSwitcher />
+
           <Link
             href="/cart"
             aria-label={`Shopping cart, ${cartCount} items`}
