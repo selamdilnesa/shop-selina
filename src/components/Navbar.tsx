@@ -104,6 +104,7 @@ function ProfileAvatar({
 
 function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const themeRef = useRef<HTMLDivElement>(null);
 
@@ -112,6 +113,10 @@ function ThemeSwitcher() {
     { name: "Dark", value: "dark", icon: "🌙" },
     { name: "System", value: "system", icon: "💻" },
   ];
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
@@ -132,6 +137,12 @@ function ThemeSwitcher() {
     };
   }, []);
 
+  if (!mounted) {
+    return (
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#eadfce] bg-[#faf7f2] dark:border-[#49372b] dark:bg-[#30231d]" />
+    );
+  }
+
   return (
     <div ref={themeRef} className="relative shrink-0">
       <button
@@ -141,16 +152,16 @@ function ThemeSwitcher() {
         aria-expanded={themeMenuOpen}
         aria-haspopup="menu"
         title="Change appearance"
-        className="flex h-4 w-3 items-center justify-center rounded-full border border-[#eadfce] bg-[#faf7f2] text-lg transition hover:border-[#d4af6a] hover:bg-[#f0e5d4]"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfce] bg-[#faf7f2] text-lg transition hover:border-[#d4af6a] hover:bg-[#f0e5d4] dark:border-[#49372b] dark:bg-[#30231d] dark:hover:bg-[#49372b]"
       >
-       {theme === "dark" ? "🌙" : "☀️"}
+        {theme === "dark" ? "🌙" : "☀️"}
       </button>
 
       {themeMenuOpen && (
         <div
           role="menu"
           aria-label="Choose appearance"
-          className="absolute right-0 top-full z-[60] mt-2 w-36 rounded-xl border border-[#eadfce] bg-white p-2 text-[#402b20] shadow-xl"
+          className="absolute right-0 top-full z-[60] mt-2 w-36 rounded-xl border border-[#eadfce] bg-white p-2 text-[#402b20] shadow-xl dark:border-[#49372b] dark:bg-[#30231d] dark:text-[#faf7f2]"
         >
           {themeOptions.map((option) => (
             <button
@@ -161,9 +172,9 @@ function ThemeSwitcher() {
                 setTheme(option.value);
                 setThemeMenuOpen(false);
               }}
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition hover:bg-[#faf7f2] ${
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition hover:bg-[#faf7f2] dark:hover:bg-[#49372b] ${
                 theme === option.value
-                  ? "bg-[#f0e5d4] font-semibold"
+                  ? "bg-[#f0e5d4] font-semibold dark:bg-[#49372b]"
                   : ""
               }`}
             >
@@ -205,6 +216,11 @@ export default function Navbar() {
     accountLink,
   ];
 
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
       if (
@@ -230,14 +246,56 @@ export default function Navbar() {
     setMenuOpen(false);
   }, [pathname]);
 
-  function isActive(href: string) {
-    if (href === "/") return pathname === "/";
-    if (href === "/login") return pathname === "/login";
-    if (href === "/profile") return pathname.startsWith("/profile");
+  // Admin navbar: logo on the left, hamburger on the far right.
+  if (pathname.startsWith("/admin")) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b border-[#eadfce] bg-white/95 px-4 py-3 shadow-sm backdrop-blur-md dark:border-[#49372b] dark:bg-[#211a16]/95 sm:px-8">
+        <nav className="flex items-center justify-between gap-4">
+          {/* Logo on the left */}
+          <Link href="/admin" className="flex min-w-0 items-center gap-2">
+            <Image
+              src="/logo.webp"
+              alt="Shop Selina logo"
+              width={100}
+              height={50}
+              priority
+              className="h-10 w-auto object-contain"
+            />
 
-    return pathname === href || pathname.startsWith(`${href}/`);
+            <span className="whitespace-nowrap text-lg font-bold tracking-wide text-[#402b20] dark:text-[#faf7f2] sm:text-xl">
+              Shop Selina
+            </span>
+          </Link>
+
+          {/* Actions on the right */}
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <Link
+              href="/"
+              className="hidden rounded-lg border border-[#d4af6a] px-4 py-2 text-sm font-medium text-[#402b20] transition hover:bg-[#f0e5d4] dark:text-[#faf7f2] dark:hover:bg-[#49372b] sm:block"
+            >
+              View Store →
+            </Link>
+
+            <ThemeSwitcher />
+
+            <button
+              type="button"
+              onClick={() =>
+                window.dispatchEvent(new CustomEvent("admin-menu-toggle"))
+              }
+              aria-label="Toggle admin navigation"
+              aria-haspopup="true"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#eadfce] bg-[#faf7f2] text-xl text-[#402b20] transition hover:bg-[#f0e5d4] dark:border-[#49372b] dark:bg-[#30231d] dark:text-[#faf7f2] dark:hover:bg-[#49372b]"
+            >
+              ☰
+            </button>
+          </div>
+        </nav>
+      </header>
+    );
   }
 
+  // Regular store navbar remains unchanged.
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#e8dfd2] bg-white/95 px-3 py-3 shadow-sm backdrop-blur-md sm:px-8">
       <nav className="flex items-center justify-between gap-2 sm:gap-4">
