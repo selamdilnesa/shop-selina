@@ -65,10 +65,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const savedAvatar = localStorage.getItem("custom_profile_avatar");
       const savedName = localStorage.getItem("custom_profile_name");
 
+      // Check if user is admin (by role or email)
+      const isAdmin = profile.role === "admin" || profile.email?.toLowerCase().includes("admin");
+
       setUser({
         ...profile,
-        name: savedName || profile.name,
-        avatar: savedAvatar || undefined,
+        name: isAdmin ? "Admin" : (savedName || profile.name),
+        role: isAdmin ? "admin" : profile.role,
+        avatar: savedAvatar || profile.avatar || undefined,
       });
     } catch (error) {
       console.error("Failed to load authenticated profile:", error);
@@ -86,9 +90,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const savedAvatar = localStorage.getItem("custom_profile_avatar");
     const savedName = localStorage.getItem("custom_profile_name");
 
+    const isAdmin = newUser.role === "admin" || newUser.email?.toLowerCase().includes("admin");
+
     setUser({
       ...newUser,
-      name: savedName || newUser.name,
+      name: isAdmin ? "Admin" : (savedName || newUser.name),
+      role: isAdmin ? "admin" : newUser.role,
       avatar: savedAvatar || newUser.avatar || undefined,
     });
 
@@ -114,6 +121,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!trimmedName) return;
 
+    // Do not override name if user is admin
+    if (user?.role === "admin") return;
+
     localStorage.setItem("custom_profile_name", trimmedName);
 
     setUser((currentUser) =>
@@ -126,6 +136,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function logout() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
+    localStorage.removeItem("custom_profile_name");
+    localStorage.removeItem("custom_profile_avatar");
 
     setUser(null);
     setLoading(false);
