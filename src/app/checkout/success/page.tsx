@@ -35,17 +35,15 @@ export default function CheckoutSuccessPage() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    // 1. Redirect if not authenticated
     if (!authLoading && !user) {
       router.replace("/login");
       return;
     }
 
-    // 2. Protect route: Ensure checkout process was actually completed
     const checkoutCompleted = sessionStorage.getItem("shop-selina-checkout-completed");
     
     if (!checkoutCompleted) {
-      router.replace("/"); // Redirect unauthorized direct access back to home
+      router.replace("/");
       return;
     }
 
@@ -69,16 +67,18 @@ export default function CheckoutSuccessPage() {
           setOrder(parsedOrder as Order);
         }
       }
-
-      // Clear the completion flag so refreshing or revisiting directly redirects home
-      sessionStorage.removeItem("shop-selina-checkout-completed");
-      sessionStorage.removeItem("shop-selina-last-order");
     } catch {
       setOrder(null);
     } finally {
       setLoaded(true);
     }
   }, [authLoading, user, router]);
+
+  const handleContinueShopping = () => {
+    sessionStorage.removeItem("shop-selina-checkout-completed");
+    sessionStorage.removeItem("shop-selina-last-order");
+    router.push("/products");
+  };
 
   if (authLoading || !loaded) {
     return (
@@ -217,12 +217,12 @@ export default function CheckoutSuccessPage() {
             </p>
           </div>
 
-          <Link
-            href="/products"
+          <button
+            onClick={handleContinueShopping}
             className="mt-8 flex w-full items-center justify-center rounded-full bg-[#402b20] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#5a3b2d] dark:bg-[#c6a16b] dark:text-[#1c1613] dark:hover:bg-[#d6b27c]"
           >
             Continue Shopping
-          </Link>
+          </button>
         </section>
       </div>
     </main>
