@@ -48,10 +48,7 @@ export type StoreUser = {
   avatar: string;
 };
 
-// ==================== API REQUEST ====================
 
-// This helper is used for reading data from the API.
-// Demo product/category changes will NOT use API mutation requests.
 
 async function apiRequest<T>(
   endpoint: string,

@@ -45,7 +45,7 @@ export default function CheckoutSuccessPage() {
     const checkoutCompleted = sessionStorage.getItem("shop-selina-checkout-completed");
     
     if (!checkoutCompleted) {
-      router.replace("/cart");
+      router.replace("/"); // Redirect unauthorized direct access back to home
       return;
     }
 
@@ -69,6 +69,10 @@ export default function CheckoutSuccessPage() {
           setOrder(parsedOrder as Order);
         }
       }
+
+      // Clear the completion flag so refreshing or revisiting directly redirects home
+      sessionStorage.removeItem("shop-selina-checkout-completed");
+      sessionStorage.removeItem("shop-selina-last-order");
     } catch {
       setOrder(null);
     } finally {

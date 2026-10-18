@@ -679,6 +679,15 @@ export default function AdminPage() {
     },
   ];
 
+
+   useEffect(() => {
+    if (!authLoading) {
+      if (!user || user.role !== "admin") {
+        router.replace("/");
+      }
+    }
+  }, [authLoading, user, router]);
+
   if (authLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#faf7f2] text-[#402b20] transition-colors dark:bg-[#1c1613] dark:text-[#faf7f2]">
@@ -688,9 +697,11 @@ export default function AdminPage() {
   }
 
   if (!user || user.role !== "admin") {
+   
     return null;
   }
 
+ 
   return (
     <main className="min-h-screen bg-[#faf7f2] p-4 text-[#402b20] transition-colors dark:bg-[#1c1613] dark:text-[#faf7f2] sm:p-8">
       <div className="mx-auto max-w-7xl">
