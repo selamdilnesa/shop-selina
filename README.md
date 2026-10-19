@@ -50,39 +50,39 @@ Here is a visual walkthrough of the application across desktop and mobile screen
 #### 1. Mobile Home, Products & Categories
 | Home Page (Mobile) | Products Catalog (Mobile) | Categories View (Mobile) |
 | :---: | :---: | :---: |
-| ![Mobile Home](public/assets/shop-selina-assets/mobile/home/home1.png) | ![Mobile Products](public/assets/shop-selina-assets/mobile/products/product-1.png) | ![Mobile Categories](public/assets/shop-selina-assets/mobile/categories/category-1.png) |
+| ![Mobile Home](./public/assets/shop-selina-assets/mobile/home/home1.png) | ![Mobile Products](./public/assets/shop-selina-assets/mobile/products/product-1.png) | ![Mobile Categories](./public/assets/shop-selina-assets/mobile/categories/category-1.png) |
 
 #### 2. Mobile Admin Views
-> ![Mobile Admin 1](public/assets/shop-selina-assets/mobile/admin/admin-1.png)
-> ![Mobile Admin 2](public/assets/shop-selina-assets/mobile/admin/admin-2.png)
+> ![Mobile Admin 1](./public/assets/shop-selina-assets/mobile/admin/admin-1.png)
+> ![Mobile Admin 2](./public/assets/shop-selina-assets/mobile/admin/admin-2.png)
 
 ---
 
 ### 🖥️ Desktop Views
 
 #### 1. Home Page (`/`)
-> ![Home Desktop 1](public/assets/shop-selina-assets/desktop/home/home-1.png)
-> ![Home Desktop 2](public/assets/shop-selina-assets/desktop/home/home-2.png)
-> ![Home Desktop 3](public/assets/shop-selina-assets/desktop/home/home-3.png)
+> ![Home Desktop 1](./public/assets/shop-selina-assets/desktop/home/home-1.png)
+> ![Home Desktop 2](./public/assets/shop-selina-assets/desktop/home/home-2.png)
+> ![Home Desktop 3](./public/assets/shop-selina-assets/desktop/home/home-3.png)
 
 #### 2. Products Catalog (`/products`)
-> ![Products Desktop 1](public/assets/shop-selina-assets/desktop/product/product-1.png)
-> ![Products Desktop 2](public/assets/shop-selina-assets/desktop/product/product-2.png)
+> ![Products Desktop 1](./public/assets/shop-selina-assets/desktop/product/product-1.png)
+> ![Products Desktop 2](./public/assets/shop-selina-assets/desktop/product/product-2.png)
 
 #### 3. Categories (`/categories`)
-> ![Categories Desktop](public/assets/shop-selina-assets/desktop/categories/categories-1.png)
+> ![Categories Desktop](./public/assets/shop-selina-assets/desktop/categories/categories-1.png)
 
 #### 4. Shopping Cart (`/cart`)
-> ![Cart Desktop](public/assets/shop-selina-assets/desktop/cart/cart-1.png)
+> ![Cart Desktop](./public/assets/shop-selina-assets/desktop/cart/cart-1.png)
 
 #### 5. Authentication & Profile (`/login`, `/register`, `/profile`)
-> ![Login Desktop](public/assets/shop-selina-assets/desktop/login-and-register/login.png)
-> ![Register Desktop](public/assets/shop-selina-assets/desktop/login-and-register/register.png)
-> ![Profile Desktop](public/assets/shop-selina-assets/desktop/profile/profile.png)
+> ![Login Desktop](./public/assets/shop-selina-assets/desktop/login-and-register/login.png)
+> ![Register Desktop](./public/assets/shop-selina-assets/desktop/login-and-register/register.png)
+> ![Profile Desktop](./public/assets/shop-selina-assets/desktop/profile/profile.png)
 
 #### 6. Admin Dashboard & Management (`/admin`)
-> ![Admin Desktop 1](public/assets/shop-selina-assets/desktop/admin-page/admin1.png)
-> ![Admin Desktop 2](public/assets/shop-selina-assets/desktop/admin-page/admin2.png)
+> ![Admin Desktop 1](./public/assets/shop-selina-assets/desktop/admin-page/admin1.png)
+> ![Admin Desktop 2](./public/assets/shop-selina-assets/desktop/admin-page/admin2.png)
 
 ---
 
@@ -118,3 +118,31 @@ To run this project locally on your machine, follow these steps:
    ```bash
    git clone [https://github.com/selamdilnesa/shop-selina.git](https://github.com/selamdilnesa/shop-selina.git)
    cd shop-selina
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables:**
+   Create a `.env.local` file in the root directory and add your API base URL:
+   ```env
+   NEXT_PUBLIC_API_URL=[https://api.escuelajs.co/api/v1](https://api.escuelajs.co/api/v1)
+   ```
+
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open in browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000) to view the application.
+
+---
+
+## 🛡️ API Integration & License
+This application integrates with the public **EscuelaJS API** for products, categories, and authentication. Safe write operations are structured to prevent interference with shared public records.
+
+---
+*Built with passion and precision by Selam Dilnesa.*
